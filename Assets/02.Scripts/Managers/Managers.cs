@@ -8,11 +8,13 @@ public class Managers : MonoBehaviour
     private static Managers _instance;
     public static Managers Instance => _instance;
 
+    private CursorManager _cursor = new CursorManager();
     private PoolManager _pool = new PoolManager();
     private InputManager _input = new InputManager();
     private ResourcesManager _resources = new ResourcesManager();
     private SceneManagerEX _scene = new SceneManagerEX();
-
+    public UnitController UnitController;
+    public static CursorManager Cursor => _instance._cursor;
     public static PoolManager Pool => _instance._pool;
     public static SceneManagerEX Scene => _instance._scene;
     public static InputManager Input => Instance._input;
@@ -43,6 +45,7 @@ public class Managers : MonoBehaviour
             _instance = managers.GetComponent<Managers>();
             
             Pool.Init();
+            Cursor.Init();
         }
     }
 }

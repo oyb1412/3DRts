@@ -10,9 +10,11 @@ public class Define
         LeftClick,
         RightClick,
         Press,
+        PressUp,
         PointDown,
         PointUp,
         Enter,
+        Drag,
     }
 
     public enum SceneType
@@ -25,5 +27,13 @@ public class Define
     {
         Ground = 6,
         Monster,
+        Player,
+    }
+
+    public enum Cursor
+    {
+        Main,
+        Attack,
+        Patrol,
     }
 }

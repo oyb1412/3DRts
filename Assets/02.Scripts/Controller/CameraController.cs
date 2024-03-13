@@ -5,28 +5,42 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private Vector3 _dest;
-
-    [SerializeField] private GameObject _player;
-    // Start is called before the first frame update
-    void Start()
+    private Vector2Int _rimitMin;
+    private Vector2Int _rimitMax;
+    [SerializeField] private int _rimit;
+    [SerializeField] private float _speed;
+    private void Start()
     {
+        _rimitMin.x = Screen.width - Screen.width + _rimit;
+        _rimitMin.y = Screen.height - Screen.height + _rimit;
         
-    }
-
-    void Update()
-    {
-        
+        _rimitMax.x = Screen.width - _rimit;
+        _rimitMax.y = Screen.height - _rimit;
     }
 
     private void LateUpdate()
     {
-        SetPosition();
+        //SetPosition();
     }
 
     private void SetPosition()
     {
-        Vector3 pos = _player.transform.position + _dest;
-        transform.position = pos;
+        if (Input.mousePosition.x < _rimitMin.x)
+        {
+            transform.position += Vector3.left * (_speed * Time.deltaTime);
+        }
+        else if(Input.mousePosition.x > _rimitMax.x)
+        {
+            transform.position -= Vector3.left * (_speed * Time.deltaTime);
+        }
+
+        if (Input.mousePosition.y < _rimitMin.y)
+        {
+            transform.position += Vector3.back * (_speed * Time.deltaTime);
+        }
+        else if (Input.mousePosition.y > _rimitMax.y)
+        {
+            transform.position -= Vector3.back * (_speed * Time.deltaTime);
+        }
     }
 }

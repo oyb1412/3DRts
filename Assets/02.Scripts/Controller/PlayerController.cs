@@ -1,125 +1,97 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : BaseController
 {
-    public enum State
+    public enum Type
     {
         None,
-        Idle,
-        Move,
-        Attack,
-        Die,
-        Reload,
-    }
-    public State MyState
-    {
-        get
-        {
-            return _state;
-        }
-        set
-        {
-            switch (value)
-            {
-                case State.Move:
-                    _anime.CrossFade("Move", .2f);
-                    break;
-                case State.Idle:
-                    _anime.CrossFade("Idle", .2f);
-                    break;
-                case State.Attack:
-                    _anime.CrossFade("Attack", .2f);
-                    break;
-            }
-            _state = value;
-        }
+        Marin,
     }
     
+
+    public Type MyType = Type.Marin;
     [SerializeField]private Vector3 _destPos;
-    [SerializeField]private State _state;
-    [SerializeField]private float _speed = 10f;
-    [SerializeField]private Animator _anime;
-    [SerializeField]private GameObject _lockTarget;
-    
-
-
-
-    void Start()
+    public Vector3 DestPos
     {
-        Managers.Input.OnMouseEvent += OnMouseEvent;
+        get { return _destPos; }
+        set { _destPos = value; }
     }
 
-    void Update()
-    {
-        switch (_state)
-        {
-            case State.Idle:
-                UpdateIdle();
-                break;
-            case State.Move:
-                UpdateMove();
-                break;
-            case State.Attack:
-                UpdateAttack();
-                break;
-        }
-    }
-    private void UpdateIdle()
+    protected override void UpdateIdle()
     {
         
     }
-    private void UpdateMove()
+    protected override void UpdateMove()
     {
-        float dir = (_destPos - transform.position).magnitude;
-        if (dir < 0.1f)
+ 
+        if (_lockTarget)
         {
-            MyState = State.Idle;
-            return;
+            _destPos.y = transform.position.y;
+            float targetDir = (_lockTarget.transform.position - transform.position).magnitude;
+            if (targetDir <= _status.AttackRange)
+            {
+                MyState = State.Attack;
+            }
+            else
+            {
+                _nma.SetDestination(_lockTarget.transform.position);
+            }
         }
         else
         {
-            Vector3 dist = (_destPos - transform.position).normalized;
-            transform.position += dist * (_speed * Time.deltaTime);
-            transform.LookAt(_destPos);
-        }
-    }
-    
-    
-    private void UpdateAttack()
-    {
-        transform.LookAt(_lockTarget.transform.position);
-    }
-    
-    private void OnMouseEvent(Define.MouseEventType type)
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(Camera.main.transform.position,ray.direction * 100f,Color.red,1f);
-        RaycastHit hit;
-        int mask =  (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);
-        bool raycastHit = Physics.Raycast(ray, out hit, float.MaxValue, mask);
-
-        switch (type)
-        {
-            case Define.MouseEventType.RightClick:
+            _destPos.y = transform.position.y;
+            float dir = (_destPos - transform.position).magnitude;
+            if (dir <= 0.1f)
             {
-                if (raycastHit)
-                {
-                    if(hit.collider.gameObject.layer == (int)Define.Layer.Ground)
-                    {
-                        _destPos = hit.point;
-                        MyState = State.Move;
-                    }
-                    else if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
-                    {
-                        MyState = State.Attack;
-                        _lockTarget = hit.collider.gameObject;
-                    }
-                }
+                MyState = State.Idle;
             }
-                break;
+            else
+            {
+                _nma.SetDestination(_destPos);
+            }
         }
+    }
+    
+    protected override void UpdateAttack()
+    {
+        if (_lockTarget.GetComponent<BaseController>().MyState == State.Die)
+        {
+            MyState = State.Idle;
+            return; 
+        }
+        transform.LookAt(_lockTarget.transform.position);
+
+    }
+    
+    protected override void UpdateDie()
+    {
+        
+    }
+
+    protected override void UpdatePatrol()
+    {
+       _destPos.y = transform.position.y;
+       float dir = (_destPos - transform.position).magnitude;
+       if (dir <= 0.1f)
+       {
+           MyState = State.Idle;
+       }
+       else
+       {
+           _nma.SetDestination(_destPos);
+           int mask = (1 << (int)Define.Layer.Monster);
+           var monsters = Physics.OverlapSphere(transform.position, scanRange, mask);
+           var monster = Util.SortToShotDistance(monsters, transform);
+           if (monster != null)
+           {
+               _lockTarget = monster;
+               MyState = State.Move;
+           }
+       }
     }
 }

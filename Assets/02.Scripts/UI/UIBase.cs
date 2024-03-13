@@ -64,6 +64,9 @@ public class UIBase : MonoBehaviour
             case Define.MouseEventType.LeftClick:
                 evt.OnClickHandler += action;
                 break;
+            case Define.MouseEventType.Drag:
+            evt.OnDragHandler += action;
+                break;
         }
     }
     

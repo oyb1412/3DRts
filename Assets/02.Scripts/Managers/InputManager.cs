@@ -19,10 +19,18 @@ public class InputManager
         {
             OnMouseEvent?.Invoke(Define.MouseEventType.LeftClick);
         } 
-        
+        if (Input.GetMouseButton(0))
+        {
+            OnMouseEvent?.Invoke(Define.MouseEventType.Press);
+        } 
         if (Input.GetMouseButtonDown(1))
         {
             OnMouseEvent?.Invoke(Define.MouseEventType.RightClick);
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            OnMouseEvent?.Invoke(Define.MouseEventType.PressUp);
         }
         
     }
