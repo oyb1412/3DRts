@@ -22,7 +22,7 @@ public class ResourcesManager
         return Resources.Load<T>(path);
     }
 
-    public GameObject Instantiate(string path, Transform parent)
+    public GameObject Activation(string path, Transform parent)
     {
         GameObject obj = Load<GameObject>($"Prefabs/{path}").GameObject();
 
@@ -40,7 +40,7 @@ public class ResourcesManager
         return go;
     }
 
-    public void Destroy(GameObject go)
+    public void Release(GameObject go)
     {
         if (go == null)
         {

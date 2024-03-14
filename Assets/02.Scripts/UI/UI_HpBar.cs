@@ -7,9 +7,7 @@ using UnityEngine.UI;
 public class UI_HpBar : UIBase
 {
     private IHit _parent;
-    private Transform _original;
-    private Transform _hpPos;
-    
+    [SerializeField]private Transform _original;
     public enum Sliders
     {
         HpBar,
@@ -19,17 +17,19 @@ public class UI_HpBar : UIBase
     {
         _parent = GetComponentInParent<IHit>();
         _original = transform.root;
-        _hpPos = transform.parent;
         Bind<Slider>(typeof(Sliders));
         Slider hpbar = Get<Slider>((int)Sliders.HpBar);
         _parent.OnHpEvent += (hp => { hpbar.value = hp; });
-        transform.parent.transform.parent = null;
+        GameObject go = GameObject.Find("@HpBar_root");
+        if (go == null)
+        {
+            go = new GameObject("@HpBar_root");
+        }
+        transform.parent.transform.parent = go.transform;
     }
 
     private void LateUpdate()
     {
-        _hpPos.position = _original.position;
+        transform.position= _original.transform.position + Vector3.back;
     }
-
-    
 }

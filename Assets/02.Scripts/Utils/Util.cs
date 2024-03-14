@@ -28,20 +28,22 @@ public class Util : MonoBehaviour
         return component;
     }
 
-    public static PlayerController[] SelectedAutoUnits(PlayerController player,PlayerController.Type type, float range, int maxCount)
+    public static PlayerUnitBase[] SelectedAutoUnits(PlayerUnitBase player,PlayerUnitBase.Type type, float range, int maxCount)
     {
-        Collider[] units = new Collider[maxCount];
+        List<Collider> units = new List<Collider>();
         int mask = (1 << (int)Define.Layer.Player);
-        units = Physics.OverlapSphere(player.transform.position, range, mask);
-        PlayerController[] players = new PlayerController[maxCount];
-        for (int i = 0; i < units.Length; i++)
+        units.AddRange(Physics.OverlapSphere(player.transform.position, range, mask));
+        PlayerUnitBase[] players = new PlayerUnitBase[maxCount];
+        for (int i = 0; i < units.Count; i++)
         {
-            PlayerController unit = units[i].GetComponent<PlayerController>();
+            if (units[i] == null)
+                return players;
+            
+            PlayerUnitBase unit = units[i].GetComponent<PlayerUnitBase>();
             if (unit.MyType == type)
                 players[i] = unit;
             
-            if (unit == null)
-                return players;
+
         }
 
         return players;

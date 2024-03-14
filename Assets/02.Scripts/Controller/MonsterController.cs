@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MonsterController : BaseController
+public class MonsterController : EnemyUnitBase
 {
-    
-
     protected override void UpdateIdle()
     {
         int mask = (1 << (int)Define.Layer.Player);
@@ -20,7 +18,7 @@ public class MonsterController : BaseController
 
     protected override void UpdateAttack()
     {
-        if (_lockTarget.GetComponent<BaseController>().MyState == State.Die)
+        if (_lockTarget.GetComponent<PlayerUnitBase>().MyState == PlayerUnitBase.State.Die)
         {
             MyState = State.Idle;
             return;

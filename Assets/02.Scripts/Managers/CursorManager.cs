@@ -14,8 +14,7 @@ public class CursorManager
         _cursors.Add(attackCursor);  
         Texture2D patrolCursor = Resources.Load<Texture2D>("Texture/Cursors/Patrol");
         _cursors.Add(patrolCursor);
-        
-        Cursor.SetCursor(mainCursor,Vector2.zero,CursorMode.Auto);
+        SetCursor(Define.Cursor.Main);
     }
 
     public void SetCursor(Define.Cursor type)
