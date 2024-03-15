@@ -1779,7 +1779,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1833,6 +1833,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44b6324ce19bed24ab4df6dc9f73ac24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _destPos: {x: 0, y: 0, z: 0}
   _state: 0
   scanRange: 0
   _lockTarget: {fileID: 0}

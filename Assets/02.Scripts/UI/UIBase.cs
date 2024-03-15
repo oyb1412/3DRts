@@ -15,15 +15,9 @@ public class UIBase : MonoBehaviour
         Icon,
     }
 
-    protected enum Buttons
-    {
-        
-    }
 
-    protected enum Texts
-    {
-        
-    }
+
+
     
     
     private void Start()
@@ -50,6 +44,14 @@ public class UIBase : MonoBehaviour
             return null;
 
         return objects[index].GetComponent<T>();
+    }
+
+    protected GameObject Get(int index)
+    {
+        if (_objects.TryGetValue(typeof(GameObject), out Object[] objects) == false)
+            return null;
+
+        return objects[index].GameObject();
     }
 
     protected void BindEvent(GameObject go, Action<PointerEventData> action, Define.MouseEventType type)

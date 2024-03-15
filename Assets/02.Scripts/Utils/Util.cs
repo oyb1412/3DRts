@@ -9,8 +9,8 @@ public class Util : MonoBehaviour
     {
         if (go == null || string.IsNullOrEmpty(name))
             return null;
-
-        foreach (Transform child in go.transform)
+        
+        foreach (var child in go.GetComponentsInChildren<Transform>())
         {
             if (child.name == name)
                 return child.gameObject;
@@ -68,6 +68,19 @@ public class Util : MonoBehaviour
         }
 
         return obj[0].transform.gameObject;
+    }
+
+    public struct MyRect
+    {
+        public float minX;
+        public float maxX;
+        public float minZ;
+        public float maxZ;
+
+        public bool Contains(float x, float z)
+        {
+            return x >= minX && x <= maxX && z <= maxZ && z >= minZ;
+        }
     }
         
 }

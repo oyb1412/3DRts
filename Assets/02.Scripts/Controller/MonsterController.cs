@@ -2,9 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MonsterController : EnemyUnitBase
+public class MonsterController : EnemyUnitBase, IState
 {
-    protected override void UpdateIdle()
+    protected override void Start()
+    {
+        base.Start();
+        _myType = Type.Zombie;
+        _myStateMachine = new StateMachine();
+        _myStateMachine.Init(this, this);
+    }
+
+    private void UpdateIdle()
     {
         int mask = (1 << (int)Define.Layer.Player);
         var players = Physics.OverlapSphere(transform.position, scanRange, mask);
@@ -12,33 +20,35 @@ public class MonsterController : EnemyUnitBase
         if (player != null)
         {
             _lockTarget = player;
-            MyState = State.Move;
+            MyState = Define.State.Move;
         }
     }
 
-    protected override void UpdateAttack()
+    private void UpdateAttack()
     {
-        if (_lockTarget.GetComponent<PlayerUnitBase>().MyState == PlayerUnitBase.State.Die)
+        if (_lockTarget.GetComponent<PlayerUnitBase>().MyState == Define.State.Die)
         {
-            MyState = State.Idle;
+            MyState = Define.State.Idle;
             return;
         }
         
         float targetDir = (_lockTarget.transform.position - transform.position).magnitude;
         if (targetDir > _status.AttackRange)
         {
-            MyState = State.Move;
+            MyState = Define.State.Move;
+            return;
         }
+        transform.LookAt(_lockTarget.transform.position);
     }
 
-    protected override void UpdateMove()
+    private void UpdateMove()
     {
         if (_lockTarget)
         {
             float targetDir = (_lockTarget.transform.position - transform.position).magnitude;
             if (targetDir <= _status.AttackRange)
             {
-                MyState = State.Attack;
+                MyState = Define.State.Attack;
             }
             else
             {
@@ -47,17 +57,44 @@ public class MonsterController : EnemyUnitBase
         }
         else
         {
-            MyState = State.Idle;
+            MyState = Define.State.Idle;
         }
     }
 
-    protected override void UpdateDie()
+    private void UpdateDie()
     {
         
     }
 
-    protected override void UpdatePatrol()
+    private void UpdatePatrol()
     {
         
+    }
+
+    public void OnUpdateState()
+    {
+        switch (_state)
+        {
+            case Define.State.Idle:
+                UpdateIdle();
+                break;
+            case Define.State.Move:
+                UpdateMove();
+                break;
+            case Define.State.Attack:
+                UpdateAttack();
+                break;
+            case Define.State.Die:
+                UpdateDie();
+                break;
+            case Define.State.Patrol:
+                UpdatePatrol();
+                break;
+        }
+    }
+
+    public void OnChangeState(Define.State state)
+    {
+        MyState = state;
     }
 }

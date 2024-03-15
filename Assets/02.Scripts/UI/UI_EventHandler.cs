@@ -12,19 +12,15 @@ public class UI_EventHandler : MonoBehaviour, IPointerClickHandler, IPointerEnte
     public void OnPointerClick(PointerEventData eventData)
     {
         OnClickHandler?.Invoke(eventData);
-        Debug.Log($"Click {eventData.GetType()}");
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         OnEnterHandler?.Invoke(eventData);
-        Debug.Log($"Enter {eventData.GetType()}");
-
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         OnDragHandler?.Invoke(eventData);
-        Debug.Log($"Drag {eventData.position}");
     }
 }

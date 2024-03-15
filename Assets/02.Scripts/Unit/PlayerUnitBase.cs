@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,6 +13,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit
         Swordman,
         Worker,
         Archer,
+        MaxCount,
     }
     public enum Select
     {
@@ -19,15 +21,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit
         Select,
         Deselect,
     }
-    public enum State
-    {
-        None,
-        Idle,
-        Move,
-        Attack,
-        Die,
-        Patrol,
-    }
+
     
     public Select MySelect
     {
@@ -51,7 +45,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit
             _select = value;
         }
     }
-    public State MyState
+    public Define.State MyState
     {
         get
         {
@@ -61,58 +55,71 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit
         {
             switch (value)
             {
-                case State.Move:
+                case Define.State.Move:
                 {
                     _anime.CrossFade("Move", .2f);
                 }
                     break;
-                case State.Idle:
+                case Define.State.Idle:
                 {
                     _nma.SetDestination(transform.position);
                     _anime.CrossFade("Idle", .2f);
                 }
                     break;
-                case State.Attack:
+                case Define.State.Attack:
                 {
                     _nma.SetDestination(transform.position);
                     _anime.CrossFade("Attack", .2f);
                 }
                     break;
-                case State.Die:
+                case Define.State.Die:
                 {
                     GetComponent<Collider>().enabled = false;
                     _nma.SetDestination(transform.position);
                     _anime.CrossFade("Die", .2f);
                 }
                     break;
-                case State.Patrol:
+                case Define.State.Patrol:
                 {
                     _anime.CrossFade("Move", .2f);
+                }
+                    break;
+                case Define.State.Hold:
+                {
+                    _nma.SetDestination(transform.position);
+                    _anime.CrossFade("Idle", .2f);
                 }
                     break;
             }
             _state = value;
         }
     }
-    public Type MyType;
 
     public Vector3 DestPos
     {
         get { return _destPos; }
         set { _destPos = value; }
     }
+
+    public Type MyType => _myType;
+
+    protected Type _myType;
     protected Vector3 _destPos;
     protected Select _select;
-    protected State _state = State.Idle;
+    protected Define.State _state = Define.State.Idle;
     protected Status _status;
+    
     protected NavMeshAgent _nma;
     protected Animator _anime;
     protected GameObject _lockTarget;
+    protected StateMachine _myStateMachine;
     [SerializeField]protected GameObject _selectedMarker;
     [SerializeField]protected GameObject _hpBar;
     [SerializeField]protected float scanRange;
 
     public Action<float> OnHpEvent { get; set; }
+    public Action DeleteHpBarEvent { get; set; }
+
     public GameObject LockTarget
     {
         get { return _lockTarget; }
@@ -125,65 +132,38 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit
         _anime = GetComponent<Animator>();
         _status = Util.GetorAddComponent<Status>(gameObject);
         _nma.speed = _status.MoveSpeed;
-        MyState = State.Idle;
         _hpBar.SetActive(false);
     }
-    
     void Update()
     {
-        switch (_state)
-        {
-            case State.Idle:
-                UpdateIdle();
-                break;
-            case State.Move:
-                UpdateMove();
-                break;
-            case State.Attack:
-                UpdateAttack();
-                break;
-            case State.Die:
-                UpdateDie();
-                break;
-            case State.Patrol:
-                UpdatePatrol();
-                break;
-        }
+        _myStateMachine.OnUpdate();
     }
-
-    protected abstract void UpdateIdle();
-    protected abstract void UpdateAttack();
-    protected abstract void UpdateMove();
-    protected abstract void UpdateDie();
-    protected abstract void UpdatePatrol();
     protected abstract void OnAttackEvent();
-
-
     public void OnDieEvent()
     {
-        Destroy(_hpBar.gameObject);
+        DeleteHpBarEvent?.Invoke();
         Managers.Pool.Release(GetComponent<Poolable>());
     }
      
-    public void IHit(Status status)
+    public void Hit(Status status)
     {
         int attack = Mathf.Max(status.AttackPower - _status.Defense, 1);
         _status.Hp -= attack;
         OnHpEvent?.Invoke(_status.Hp / _status.MaxHp);
         if (_status.Hp <= 0)
         {
-            MyState = State.Die;
+            MyState = Define.State.Die;
         }
     }
 
-    public void PlayerUnitMove(Vector3 destPos, State state)
+    public void PlayerUnitMove(Vector3 destPos, Define.State state)
     {
         DestPos = destPos;
         LockTarget = null;
         MyState = state;
     }
 
-    public void PlayerUnitAttack(State state, GameObject target)
+    public void PlayerUnitAttack(Define.State state, GameObject target)
     {
         MyState = state;
         LockTarget = target;

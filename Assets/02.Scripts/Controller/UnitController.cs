@@ -2,25 +2,64 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class UnitController : MonoBehaviour
 {
+    public enum State
+    {
+        None,
+        ClickS,
+        ClickA,
+        ClickH,
+        ClickQ,
+        ClickB,
+    }
     private List<PlayerUnitBase> _selectUnit = new List<PlayerUnitBase>();
     private PlayerUnitBase _lastSelectUnit;
     private EnemyUnitBase _lastSelectMonster;
-    [SerializeField]private bool _isAClickTrigger;
+    public Action<IBehaviour> behaivourUIEvent;
+    [SerializeField]private State _myState = State.None;
+    
     private void Start()
     {
         Managers.Input.OnMouseEvent += UnitSelectEvent; 
         Managers.Input.OnMouseEvent += UnitAttackAndMoveEvent;
         Managers.Input.OnMouseEvent += UnitAClickAttackAndMoveEvent;
-        Managers.Input.OnKeyboardEvent += OnAClickTrigger;
+        Managers.Input.OnKeyboardEvent += OnUpdateState;
     }
 
+    public void SetState(State state)
+    {
+        _myState = state;
+        if (state == State.ClickH)
+        {
+            SetAllUnitState(Define.State.Hold);
+        }
+
+        if (state == State.ClickS)
+        {
+            SetAllUnitState(Define.State.Idle);
+        }
+    }
+    private void OnUpdateState()
+    {
+        if (Input.GetKeyDown(KeyCode.S))
+            SetState(State.ClickS);
+        if (Input.GetKeyDown(KeyCode.A))
+            SetState(State.ClickA);
+        if (Input.GetKeyDown(KeyCode.H))
+            SetState(State.ClickH);
+        if (Input.GetKeyDown(KeyCode.Q))
+            SetState(State.ClickQ);
+        if (Input.GetKeyDown(KeyCode.B))
+            SetState(State.ClickB);
+    }
     public void UnitSelectEvent(Define.MouseEventType type)
     {
-        if (_isAClickTrigger)
+        if (_myState == State.ClickA || _myState == State.ClickQ)
             return;
         
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -70,7 +109,7 @@ public class UnitController : MonoBehaviour
                             DeSelectedUnit();
                             SelectedUnit(hit);
                         }
-
+                        
 
                     }
                     else if (enemy)
@@ -80,11 +119,14 @@ public class UnitController : MonoBehaviour
                         _lastSelectMonster.MySelect = EnemyUnitBase.Select.Select;
                     }
                 }
-                else
+                else if(_lastSelectMonster != null)
                 {
+                    _lastSelectMonster.MySelect = EnemyUnitBase.Select.Deselect;
                     _lastSelectMonster = null;
                     DeSelectedUnit();
                 }
+                else
+                    DeSelectedUnit();
             }
                 break;
         }
@@ -97,6 +139,7 @@ public class UnitController : MonoBehaviour
             player.MySelect = PlayerUnitBase.Select.Deselect;
         }
         _selectUnit.Clear();
+        CheckAllUnitType();
     }
 
     private void SelectedUnit(RaycastHit hit)
@@ -104,6 +147,7 @@ public class UnitController : MonoBehaviour
         PlayerUnitBase player = hit.collider.GetComponent<PlayerUnitBase>();
         player.MySelect = PlayerUnitBase.Select.Select;
         _selectUnit.Add(player);
+        CheckAllUnitType();
     }
     
     public void SelectedUnit(GameObject go)
@@ -111,6 +155,7 @@ public class UnitController : MonoBehaviour
         PlayerUnitBase player = go.GetComponent<PlayerUnitBase>();
         player.MySelect = PlayerUnitBase.Select.Select;
         _selectUnit.Add(player);
+        CheckAllUnitType();
     }
     
     private void SelectedUnits(PlayerUnitBase[] player)
@@ -126,11 +171,13 @@ public class UnitController : MonoBehaviour
             player[i].MySelect = PlayerUnitBase.Select.Select;
             _selectUnit.Add(player[i]);
         }
+
+        CheckAllUnitType();
     }
     
     private void UnitAttackAndMoveEvent(Define.MouseEventType type)
     {       
-        if (_selectUnit.Count == 0 || _isAClickTrigger)
+        if (_selectUnit.Count == 0 || _myState == State.ClickA)
             return;
         
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -146,7 +193,7 @@ public class UnitController : MonoBehaviour
                 int targetPositionListIndex = 0;
                 foreach (PlayerUnitBase player in _selectUnit)
                 {
-                    player.PlayerUnitMove(targetPositionList[targetPositionListIndex], PlayerUnitBase.State.Move);
+                    player.PlayerUnitMove(targetPositionList[targetPositionListIndex], Define.State.Move);
                     targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
                 }
                 
@@ -155,7 +202,7 @@ public class UnitController : MonoBehaviour
             {
                 foreach (PlayerUnitBase player in _selectUnit)
                 {
-                    player.PlayerUnitAttack(PlayerUnitBase.State.Move, hit.collider.gameObject);
+                    player.PlayerUnitAttack(Define.State.Move, hit.collider.gameObject);
                 }
                 
             }
@@ -192,23 +239,35 @@ public class UnitController : MonoBehaviour
         return Quaternion.Euler(0, angle, 0) * vec;
     }
 
-    private void OnAClickTrigger()
+    private void CheckAllUnitType()
     {
+        int count = 0;
         if (_selectUnit.Count == 0)
-            return;
-        
-        if (Input.GetKeyDown(KeyCode.A))
         {
-            if (!_isAClickTrigger)
-                _isAClickTrigger = true;
-            else if (_isAClickTrigger)
-                _isAClickTrigger = false;
+            behaivourUIEvent?.Invoke(null);
+            return;
+        }
+        foreach (PlayerUnitBase unit in _selectUnit)
+        {
+            if (unit.GetComponent<IBuilder>() != null)
+            {
+                behaivourUIEvent?.Invoke(unit as IBuilder);
+                return;
+            }
+        }
+        foreach (PlayerUnitBase unit in _selectUnit)
+        {
+            if (unit.GetComponent<IAttacker>() != null)
+            {
+                behaivourUIEvent?.Invoke(unit as IAttacker);
+                return;
+            }
         }
     }
-
+    
     private void UnitAClickAttackAndMoveEvent(Define.MouseEventType type)
     {
-        if (!_isAClickTrigger || _selectUnit.Count == 0)
+        if (_selectUnit.Count == 0)
             return;
         
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -217,24 +276,53 @@ public class UnitController : MonoBehaviour
         bool raycastHit = Physics.Raycast(ray, out hit, float.MaxValue, mask);
         if (raycastHit && type == Define.MouseEventType.LeftClick)
         {
-            if(hit.collider.gameObject.layer == (int)Define.Layer.Ground)
+            if (_myState == State.ClickA)
             {
-                List<Vector3> targetPositionList = GetPositionListAround(hit.point, new float[] {3f, 6f, 9f}, new int[] {5, 10, 20});
-                int targetPositionListIndex = 0;
-                foreach (PlayerUnitBase player in _selectUnit)
+                if (hit.collider.gameObject.layer == (int)Define.Layer.Ground)
                 {
-                    player.PlayerUnitMove(targetPositionList[targetPositionListIndex], PlayerUnitBase.State.Patrol);
-                    targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
+                    List<Vector3> targetPositionList =
+                        GetPositionListAround(hit.point, new float[] { 3f, 6f, 9f }, new int[] { 5, 10, 20 });
+                    int targetPositionListIndex = 0;
+                    foreach (PlayerUnitBase player in _selectUnit)
+                    {
+                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], Define.State.Patrol);
+                        targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
+                    }
+                }
+                else if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+                {
+                    foreach (PlayerUnitBase player in _selectUnit)
+                    {
+                        player.PlayerUnitAttack(Define.State.Move, hit.collider.gameObject);
+                    }
                 }
             }
-            else if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
+            else if (_myState == State.ClickQ)
             {
-                foreach (PlayerUnitBase player in _selectUnit)
+                if (hit.collider.gameObject.layer == (int)Define.Layer.Ground)
                 {
-                    player.PlayerUnitAttack(PlayerUnitBase.State.Move, hit.collider.gameObject);
+                    List<Vector3> targetPositionList =
+                        GetPositionListAround(hit.point, new float[] { 3f, 6f, 9f }, new int[] { 5, 10, 20 });
+                    int targetPositionListIndex = 0;
+                    foreach (PlayerUnitBase player in _selectUnit)
+                    {
+                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], Define.State.Move);
+                        targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
+                    }
                 }
             }
         }
-        _isAClickTrigger = false;
+        _myState = State.None;
+    }
+
+    public void SetAllUnitState(Define.State state)
+    {
+        if (_selectUnit.Count == 0)
+            return;
+
+        foreach (PlayerUnitBase player in _selectUnit)
+        {
+            player.MyState = state;
+        }
     }
 }

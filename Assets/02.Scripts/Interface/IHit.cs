@@ -5,6 +5,7 @@ using UnityEngine;
 
 public interface IHit
 {
-    public void IHit(Status status);
+    public void Hit(Status status);
     public Action<float> OnHpEvent { get; set; }
+    public Action DeleteHpBarEvent { get; set; }
 }

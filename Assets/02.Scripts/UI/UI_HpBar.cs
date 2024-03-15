@@ -20,6 +20,7 @@ public class UI_HpBar : UIBase
         Bind<Slider>(typeof(Sliders));
         Slider hpbar = Get<Slider>((int)Sliders.HpBar);
         _parent.OnHpEvent += (hp => { hpbar.value = hp; });
+        _parent.DeleteHpBarEvent += () => Destroy(this);
         GameObject go = GameObject.Find("@HpBar_root");
         if (go == null)
         {

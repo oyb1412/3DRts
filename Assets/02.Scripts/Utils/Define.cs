@@ -4,6 +4,22 @@ using UnityEngine;
 
 public class Define 
 {
+    public enum BuildList
+    {
+        Castle,
+        Barrack,
+    }
+    public enum State
+    {
+        None,
+        Idle,
+        Move,
+        Attack,
+        Die,
+        Patrol,
+        Hold,
+        Build,
+    }
     public enum MouseEventType
     {
         None,
