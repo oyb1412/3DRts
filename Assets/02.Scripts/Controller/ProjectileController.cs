@@ -1,17 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ProjectileController : MonoBehaviour
 {
-    private Status _status;
+    private UnitStatus _status;
     private GameObject _target;
     private Vector3 _dir;
     [SerializeField] private float _speed;
 
-    public void Init(GameObject target, Vector3 dir, Vector3 pos, Status status)
+    public void Init(GameObject target,Vector3 pos, UnitStatus status)
     {
+        transform.position = pos;
+        _dir = (target.transform.position - transform.position).normalized;
         _target = target;
         _status = status;
     }

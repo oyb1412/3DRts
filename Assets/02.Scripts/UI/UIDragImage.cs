@@ -1,31 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
-public class UI_DragImage : UIBase
+public class UIDragImage : UIBase
 {
-    public enum Images
+    private new enum Images
     {
         Drag,
     }
 
-    [SerializeField]private Vector2 _startPos;
-    [SerializeField]private Vector2 _endPos;
+    private Vector2 _startPos;
+    private Vector2 _endPos;
     private RectTransform _dragRectangle;
     private Image _dragImage;
-
-    [SerializeField]private Rect _bound;
+    private Rect _bound;
     
     private void Start()
     {
         Managers.Input.OnMouseEvent += OnDragEvent;
         Bind<Image>( typeof(Images));
-        _dragImage = GetImage((int)Images.Drag);
+        _dragImage = Get<Image>((int)Images.Drag).GetComponent<Image>();
     }
 
-    public void OnDragEvent(Define.MouseEventType type)
+    private void OnDragEvent(Define.MouseEventType type)
     {
         if (type == Define.MouseEventType.LeftClick)
         {
@@ -81,12 +77,12 @@ public class UI_DragImage : UIBase
 
     private void SelectedRectangleUnits()
     {
-        var units = GameObject.FindGameObjectsWithTag("Player");
-        for (int i = 0; i < units.Length; i++)
+        var units = GameObject.FindObjectsByType<PlayerUnitBase>(FindObjectsSortMode.None);
+        foreach (var t in units)
         {
-            if (_bound.Contains(Camera.main.WorldToScreenPoint(units[i].transform.position)))
+            if (_bound.Contains(Camera.main.WorldToScreenPoint(t.transform.position)))
             {
-                Managers.Instance.UnitController.SelectedUnit(units[i]);
+                Managers.Instance.UnitController.SelectedUnit(t.gameObject);
             }
         }
     }

@@ -1,13 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
-public class SceneManagerEX
+public class SceneManagerEx
 {
-    public BaseScene CurrentScene => GameObject.FindFirstObjectByType(typeof(BaseScene)).GetComponent<BaseScene>();
+    public BaseScene CurrentScene => Object.FindFirstObjectByType(typeof(BaseScene)).GetComponent<BaseScene>();
 
     public void LoadScene(Define.SceneType type)
     {

@@ -1,11 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class PoolManager
 {
-    class Pool
+    private class Pool
     {
         public GameObject Original { get; private set; }
         public Transform Root { get; private set; }
@@ -44,10 +43,7 @@ public class PoolManager
         {
             Poolable poolable;
 
-            if (_poolStack.Count > 0)
-                poolable = _poolStack.Pop();
-            else
-                poolable = Create();
+            poolable = _poolStack.Count > 0 ? _poolStack.Pop() : Create();
             
             poolable.gameObject.SetActive(true);
 

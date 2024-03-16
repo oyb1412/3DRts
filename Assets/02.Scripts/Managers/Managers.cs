@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Managers : MonoBehaviour
@@ -9,19 +6,22 @@ public class Managers : MonoBehaviour
     public static Managers Instance => _instance;
 
     private CursorManager _cursor = new CursorManager();
+    private GameManager _game = new GameManager();
     private BuildManager _build = new BuildManager();
     private PoolManager _pool = new PoolManager();
     private InputManager _input = new InputManager();
     private ResourcesManager _resources = new ResourcesManager();
-    private SceneManagerEX _scene = new SceneManagerEX();
+    private SceneManagerEx _scene = new SceneManagerEx();
     public UnitController UnitController;
     public Node Node;
+    public UIBehaviourPanelController UIBehaviourPanel;
     public static CursorManager Cursor => _instance._cursor;
     public static PoolManager Pool => _instance._pool;
-    public static SceneManagerEX Scene => _instance._scene;
+    public static SceneManagerEx Scene => _instance._scene;
     public static InputManager Input => Instance._input;
     public static ResourcesManager Resources => Instance._resources;
     public static BuildManager Build => Instance._build;
+    public static GameManager Game => Instance._game;
     
     private void Awake()
     {
@@ -51,6 +51,7 @@ public class Managers : MonoBehaviour
             Pool.Init();
             Cursor.Init();
             Build.Init();
+            _game.Init();
         }
     }
     

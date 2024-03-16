@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,21 +8,7 @@ using Object = UnityEngine.Object;
 
 public class UIBase : MonoBehaviour
 {
-    protected Dictionary<Type, Object[]> _objects = new Dictionary<Type, Object[]>();
-    public enum Images
-    {
-        Icon,
-    }
-
-
-
-
-    
-    
-    private void Start()
-    {
-        
-    }
+    private Dictionary<Type, Object[]> _objects = new Dictionary<Type, Object[]>();
 
     protected void Bind<T>(Type type) where T : Object
     {
@@ -38,12 +23,12 @@ public class UIBase : MonoBehaviour
         _objects.Add(typeof(T), objects);
     }
 
-    protected T Get<T>(int index) where T : Object
+    protected GameObject Get<T>(int index) where T : Object
     {
         if (_objects.TryGetValue(typeof(T), out Object[] objects) == false)
             return null;
 
-        return objects[index].GetComponent<T>();
+        return (GameObject)objects[index];
     }
 
     protected GameObject Get(int index)
@@ -51,12 +36,12 @@ public class UIBase : MonoBehaviour
         if (_objects.TryGetValue(typeof(GameObject), out Object[] objects) == false)
             return null;
 
-        return objects[index].GameObject();
+        return (GameObject)objects[index];
     }
 
     protected void BindEvent(GameObject go, Action<PointerEventData> action, Define.MouseEventType type)
     {
-        UI_EventHandler evt = Util.GetorAddComponent<UI_EventHandler>(go);
+        UIEventHandler evt = Util.GetOrAddComponent<UIEventHandler>(go);
 
         switch (type)
         {
@@ -71,8 +56,4 @@ public class UIBase : MonoBehaviour
                 break;
         }
     }
-    
-    protected Image GetImage(int index) { return Get<Image>(index); }
-    protected Button GetButton(int index) { return Get<Button>(index); }
-    protected Text GetText(int index) { return Get<Text>(index); }
 }

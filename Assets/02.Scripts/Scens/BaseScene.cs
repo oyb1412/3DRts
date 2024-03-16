@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,7 +7,7 @@ public abstract class BaseScene : MonoBehaviour
 
     public abstract void Clear();
 
-    public void Init()
+    private void Init()
     {
         var obj = GameObject.FindFirstObjectByType(typeof(EventSystem));
         if (obj == null)

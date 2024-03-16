@@ -1,21 +1,18 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private Vector2Int _rimitMin;
-    private Vector2Int _rimitMax;
-    [SerializeField] private int _rimit;
-    [SerializeField] private float _speed;
+    private Vector2Int _limitMin;
+    private Vector2Int _limitMax;
+    private int _limit;
+    private float _speed;
     private void Start()
     {
-        _rimitMin.x = Screen.width - Screen.width + _rimit;
-        _rimitMin.y = Screen.height - Screen.height + _rimit;
+        _limitMin.x = Screen.width - Screen.width + _limit;
+        _limitMin.y = Screen.height - Screen.height + _limit;
         
-        _rimitMax.x = Screen.width - _rimit;
-        _rimitMax.y = Screen.height - _rimit;
+        _limitMax.x = Screen.width - _limit;
+        _limitMax.y = Screen.height - _limit;
     }
 
     private void LateUpdate()
@@ -25,20 +22,20 @@ public class CameraController : MonoBehaviour
 
     private void SetPosition()
     {
-        if (Input.mousePosition.x < _rimitMin.x)
+        if (Input.mousePosition.x < _limitMin.x)
         {
             transform.position += Vector3.left * (_speed * Time.deltaTime);
         }
-        else if(Input.mousePosition.x > _rimitMax.x)
+        else if(Input.mousePosition.x > _limitMax.x)
         {
             transform.position -= Vector3.left * (_speed * Time.deltaTime);
         }
 
-        if (Input.mousePosition.y < _rimitMin.y)
+        if (Input.mousePosition.y < _limitMin.y)
         {
             transform.position += Vector3.back * (_speed * Time.deltaTime);
         }
-        else if (Input.mousePosition.y > _rimitMax.y)
+        else if (Input.mousePosition.y > _limitMax.y)
         {
             transform.position -= Vector3.back * (_speed * Time.deltaTime);
         }

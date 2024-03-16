@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UI_EventHandler : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IDragHandler
+public class UIEventHandler : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IDragHandler
 {
     public Action<PointerEventData> OnEnterHandler;
     public Action<PointerEventData> OnClickHandler;

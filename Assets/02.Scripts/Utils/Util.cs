@@ -19,7 +19,7 @@ public class Util : MonoBehaviour
         return null;
     }
 
-    public static T GetorAddComponent<T>(GameObject go) where T : Component
+    public static T GetOrAddComponent<T>(GameObject go) where T : Component
     {
         var component = go.GetComponent<T>();
         if (component == null)
@@ -72,14 +72,14 @@ public class Util : MonoBehaviour
 
     public struct MyRect
     {
-        public float minX;
-        public float maxX;
-        public float minZ;
-        public float maxZ;
+        public float MinX;
+        public float MaxX;
+        public float MinZ;
+        public float MaxZ;
 
         public bool Contains(float x, float z)
         {
-            return x >= minX && x <= maxX && z <= maxZ && z >= minZ;
+            return x >= MinX && x <= MaxX && z <= MaxZ && z >= MinZ;
         }
     }
         

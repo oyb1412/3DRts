@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class Define 
 {
     public enum BuildList
@@ -9,17 +5,7 @@ public class Define
         Castle,
         Barrack,
     }
-    public enum State
-    {
-        None,
-        Idle,
-        Move,
-        Attack,
-        Die,
-        Patrol,
-        Hold,
-        Build,
-    }
+ 
     public enum MouseEventType
     {
         None,
@@ -38,12 +24,20 @@ public class Define
         None,
         InGame,
     }
+    
+    public enum Select
+    {
+        None,
+        Select,
+        Deselect,
+    }
 
     public enum Layer
     {
         Ground = 6,
         Monster,
         Player,
+        Building,
     }
 
     public enum Cursor

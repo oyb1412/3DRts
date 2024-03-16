@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -11,14 +9,19 @@ public class InputManager
     
     public void OnUpdate()
     {
+        if (Input.GetMouseButtonUp(0))
+        {
+            OnMouseEvent?.Invoke(Define.MouseEventType.PressUp);
+        }
+
         if (EventSystem.current.IsPointerOverGameObject())
             return;
         
+
         if (Input.anyKey)
         {
             OnKeyboardEvent?.Invoke();
         }
-
         if (Input.GetMouseButtonDown(0))
         {
             OnMouseEvent?.Invoke(Define.MouseEventType.LeftClick);
@@ -32,10 +35,7 @@ public class InputManager
             OnMouseEvent?.Invoke(Define.MouseEventType.RightClick);
         }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            OnMouseEvent?.Invoke(Define.MouseEventType.PressUp);
-        }
+  
         
     }
 }

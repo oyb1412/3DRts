@@ -1,95 +1,110 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildManager
 {
-    private Dictionary<Define.BuildList, GameObject> _building = new Dictionary<Define.BuildList, GameObject>();
-    private GameObject currentBuilding;
+    private List<GameObject> _building = new List<GameObject>();
+    public GameObject CurrentBuilding;
     private Util.MyRect _bound;
-    private MeshRenderer currentMesh;
-    private Material _original;
-    private Material _red;
+    private MeshRenderer _currentMesh;
+    private Material _originalMaterial;
+    private Material _redMaterial;
+    private WorkerController _worker;
+    public Action CancelBuild;
     public void Init()
     {
-        GameObject[] building = Resources.LoadAll<GameObject>($"Building");
-        for(int i = 0;i < building.Length; i++)
-        {
-            _building.Add((Define.BuildList)i, building[i]);
-        }
-
-        _original = Resources.Load<Material>("Material/BuildingOiriginal");
-        _red = Resources.Load<Material>("Material/BuildingRed");
+        _originalMaterial = Resources.Load<Material>("Material/BuildingOriginal");
+        _redMaterial = Resources.Load<Material>("Material/BuildingRed");
 
         Managers.Input.OnMouseEvent += Create;
     }
     
     public void BuildShadow(Define.BuildList building)
     {
-        currentBuilding = Managers.Resources.Activation($"Building/{Enum.GetName(typeof(Define.BuildList), building)}", null);
-        currentMesh = currentBuilding.GetComponent<MeshRenderer>();
+        //선택중인 유닛 중에 빌더가 있는지
+        var builders = Managers.Instance.UnitController.SelectUnit.FindAll(unit => unit is IBuilder);
+
+        foreach (var item in builders)
+        {
+            //빌더중에 buildstate가 아닌 빌더가 있는지
+            if (item.CurrentState is not BuildState)
+            {
+                //todo
+                //비용이 충분할 때만 설치 가능하도록
+                //if (build._myStatus.CreateCost <= Managers.Game.CurrentGold)
+                {
+                    CurrentBuilding = Managers.Resources.Activation($"Building/{building.ToString()}", null);
+                    _currentMesh = CurrentBuilding.GetComponent<MeshRenderer>();
+                    _worker = item as WorkerController;
+                    //Managers.Game.CurrentGold -= build._myStatus.CreateCost;
+                }
+            }
+        }
     }
 
     private void Create(Define.MouseEventType type)
     {
-        if (!currentBuilding)
+        if (!CurrentBuilding)
             return;
 
         switch (type)
         {
-            //todo
-            //esc로 설치 취소 구현
             case Define.MouseEventType.RightClick:
-                currentBuilding = null;
+                CancelBuild?.Invoke();
+                Managers.Resources.Release(CurrentBuilding);
+                CurrentBuilding = null;
                 break;
             case Define.MouseEventType.LeftClick:
-                //todo 
-                //타워 설치
+                if (_currentMesh.material != _redMaterial)
+                {
+                    _building.Add(CurrentBuilding);
+                    _worker.SetBuildState(CurrentBuilding);
+                    CurrentBuilding = null;
+                }
                 break;
         }
     }
-    
+
     public void OnUpdate()
     {
-        if (!currentBuilding)
+        if (!CurrentBuilding)
             return;
         
         Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = Camera.main.WorldToScreenPoint(currentBuilding.transform.position).z;
-
+        mousePosition.z = Camera.main.WorldToScreenPoint(CurrentBuilding.transform.position).z;
         Vector3 objectPosition = Camera.main.ScreenToWorldPoint(mousePosition);
 
-        currentBuilding.transform.position = new Vector3(objectPosition.x,2f,objectPosition.z);
-        var ren = 
-        _bound.minX = currentBuilding.transform.position.x - currentMesh.bounds.size.x / 2;
-        _bound.maxX = currentBuilding.transform.position.x + currentMesh.bounds.size.x / 2;
-        _bound.minZ = currentBuilding.transform.position.z - currentMesh.bounds.size.z / 2;
-        _bound.maxZ = currentBuilding.transform.position.z + currentMesh.bounds.size.z / 2;
+        CurrentBuilding.transform.position = new Vector3(objectPosition.x,2f,objectPosition.z);
+        _bound.MinX = CurrentBuilding.transform.position.x - _currentMesh.bounds.size.x / 2;
+        _bound.MaxX = CurrentBuilding.transform.position.x + _currentMesh.bounds.size.x / 2;
+        _bound.MinZ = CurrentBuilding.transform.position.z - _currentMesh.bounds.size.z / 2;
+        _bound.MaxZ = CurrentBuilding.transform.position.z + _currentMesh.bounds.size.z / 2;
 
+        var units = GameObject.FindGameObjectsWithTag("Obstacle");
         var node = Managers.Instance.Node.Buildings;
+        
+        foreach (var item in units)
+        {
+            if (!_bound.Contains(item.transform.position.x, item.transform.position.z)) continue;
+            _currentMesh.material = _redMaterial;
+            return;
+        }
+        
         foreach (var item in node)
         {
-            if (_bound.Contains(item.X, item.Z))
+            if (!_bound.Contains(item.X, item.Z)) continue;
+            switch (item.BnteractableTypes)
             {
-                if (item.interactableTypes == InteractableTypes.Building)
-                {
-                    currentMesh.material = _red;
+                case InteractableTypes.Building:
+                    _currentMesh.material = _redMaterial;
                     return;
-                }
-                if(item.interactableTypes == InteractableTypes.None)
-                {
-                    currentMesh.material = _original;
-                }
+                case InteractableTypes.None:
+                    _currentMesh.material = _originalMaterial;
+                    break;
             }
         }
         
     }
-    
-    
-    
-    public void Destory()
-    {
-        
-    }
+
 }

@@ -1,24 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class ResourcesManager 
 {
-    public Object Load<T>(string path) where T : Object
+    private Object Load<T>(string path) where T : Object
     {
-        if (typeof(T) == typeof(GameObject))
-        {
-            string name = path;
-            int index = name.LastIndexOf("/");
-            if (index > 0)
-                name = name.Substring(index + 1);
+        if (typeof(T) != typeof(GameObject)) return Resources.Load<T>(path);
+        string name = path;
+        int index = name.LastIndexOf("/", StringComparison.Ordinal);
+        if (index > 0)
+            name = name.Substring(index + 1);
 
-            GameObject go = Managers.Pool.GetOriginal(name);
-            if (go != null)
-                return go as T;
-        }
-        
+        GameObject go = Managers.Pool.GetOriginal(name);
+        if (go != null)
+            return go as T;
+
         return Resources.Load<T>(path);
     }
 
