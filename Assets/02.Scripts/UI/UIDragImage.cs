@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,25 +17,24 @@ public class UIDragImage : UIBase
     
     private void Start()
     {
-        Managers.Input.OnMouseEvent += OnDragEvent;
         Bind<Image>( typeof(Images));
         _dragImage = Get<Image>((int)Images.Drag).GetComponent<Image>();
     }
 
-    private void OnDragEvent(Define.MouseEventType type)
+    private void Update()
     {
-        if (type == Define.MouseEventType.LeftClick)
+        if (Input.GetMouseButtonDown(0))
         {
             _startPos = Input.mousePosition;
         }
 
-        if (type == Define.MouseEventType.Press)
+        if (Input.GetMouseButton(0))
         {
             _endPos = Input.mousePosition;
             DrawDragRectangle();
         }
 
-        if (type == Define.MouseEventType.PressUp)
+        if (Input.GetMouseButtonUp(0))
         {
             SetBound();
             SelectedRectangleUnits();
@@ -77,7 +77,7 @@ public class UIDragImage : UIBase
 
     private void SelectedRectangleUnits()
     {
-        var units = GameObject.FindObjectsByType<PlayerUnitBase>(FindObjectsSortMode.None);
+        var units = FindObjectsByType<PlayerUnitBase>(FindObjectsSortMode.None);
         foreach (var t in units)
         {
             if (_bound.Contains(Camera.main.WorldToScreenPoint(t.transform.position)))

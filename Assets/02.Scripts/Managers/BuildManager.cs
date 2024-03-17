@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BuildManager
 {
+    private bool _canBuild;
     private List<GameObject> _building = new List<GameObject>();
     public GameObject CurrentBuilding;
     private Util.MyRect _bound;
@@ -37,6 +38,7 @@ public class BuildManager
                     CurrentBuilding = Managers.Resources.Activation($"Building/{building.ToString()}", null);
                     _currentMesh = CurrentBuilding.GetComponent<MeshRenderer>();
                     _worker = item as WorkerController;
+                    break;
                     //Managers.Game.CurrentGold -= build._myStatus.CreateCost;
                 }
             }
@@ -56,16 +58,17 @@ public class BuildManager
                 CurrentBuilding = null;
                 break;
             case Define.MouseEventType.LeftClick:
-                if (_currentMesh.material != _redMaterial)
+                if (_canBuild)
                 {
+                    Managers.Instance.Node.SetNode(_bound);
                     _building.Add(CurrentBuilding);
                     _worker.SetBuildState(CurrentBuilding);
+                    Managers.Game.SetGoldEvent(50);
                     CurrentBuilding = null;
                 }
                 break;
         }
     }
-
     public void OnUpdate()
     {
         if (!CurrentBuilding)
@@ -97,9 +100,11 @@ public class BuildManager
             switch (item.BnteractableTypes)
             {
                 case InteractableTypes.Building:
+                    _canBuild = false;
                     _currentMesh.material = _redMaterial;
                     return;
                 case InteractableTypes.None:
+                    _canBuild = true;
                     _currentMesh.material = _originalMaterial;
                     break;
             }

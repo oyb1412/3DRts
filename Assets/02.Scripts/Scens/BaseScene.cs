@@ -7,7 +7,7 @@ public abstract class BaseScene : MonoBehaviour
 
     public abstract void Clear();
 
-    private void Init()
+    protected virtual void Init()
     {
         var obj = GameObject.FindFirstObjectByType(typeof(EventSystem));
         if (obj == null)

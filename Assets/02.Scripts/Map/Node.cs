@@ -17,22 +17,44 @@ public struct NodeData
 
 public class Node : MonoBehaviour
 {
-    Terrain _terrain;
+    public Terrain _terrain;
     public NodeData[,] Buildings;
-    void Start()
+    void Awake()
     {
         _terrain = GetComponent<Terrain>();
         Vector3 terrainSize = _terrain.terrainData.size;
         Buildings = new NodeData[(int)terrainSize.x, (int)terrainSize.z];
-        for (int z = 0; z < Buildings.GetLength(1); z++)
+        for (int z = 0; z < Buildings.GetLength(0); z++)
         {
-            for (int x = 0; x < Buildings.GetLength(0); x++)
+            for (int x = 0; x < Buildings.GetLength(1); x++)
             {
                 Buildings[z, x].X = x;
                 Buildings[z, x].Z = z;
             }
         }
+    }
 
-        Buildings[1, 1].BnteractableTypes = InteractableTypes.Building;
+    public void SetNode(GameObject go)
+    {
+        Util.MyRect bound;
+        MeshRenderer currentMesh = go.GetComponent<MeshRenderer>();
+        bound.MinX = go.transform.position.x - currentMesh.bounds.size.x / 2;
+        bound.MaxX = go.transform.position.x + currentMesh.bounds.size.x / 2;
+        bound.MinZ = go.transform.position.z - currentMesh.bounds.size.z / 2;
+        bound.MaxZ = go.transform.position.z + currentMesh.bounds.size.z / 2;
+        
+        SetNode(bound);
+    }
+    
+    public void SetNode(Util.MyRect bound)
+    {
+        for (int z = 0; z < Buildings.GetLength(1); z++)
+        {
+            for (int x = 0; x < Buildings.GetLength(0); x++)
+            {
+                if (bound.Contains(Buildings[z,x].X, Buildings[z,x].Z))
+                    Buildings[z, x].BnteractableTypes = InteractableTypes.Building;
+            }
+        }
     }
 }

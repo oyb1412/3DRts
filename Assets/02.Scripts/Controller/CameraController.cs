@@ -1,43 +1,46 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CameraController : MonoBehaviour
 {
     private Vector2Int _limitMin;
     private Vector2Int _limitMax;
-    private int _limit;
-    private float _speed;
+    private Vector2Int _limit;
+    [SerializeField]private float Speed;
     private void Start()
     {
-        _limitMin.x = Screen.width - Screen.width + _limit;
-        _limitMin.y = Screen.height - Screen.height + _limit;
+        _limit.x = Screen.width / 10;
+        _limit.y = Screen.height / 10;
         
-        _limitMax.x = Screen.width - _limit;
-        _limitMax.y = Screen.height - _limit;
+        _limitMin.x = Screen.width - Screen.width + _limit.x;
+        _limitMin.y = Screen.height - Screen.height + _limit.y;
+        _limitMax.x = Screen.width - _limit.x;
+        _limitMax.y = Screen.height - _limit.y;
     }
 
     private void LateUpdate()
     {
-        //SetPosition();
+        SetPosition();
     }
 
     private void SetPosition()
     {
-        if (Input.mousePosition.x < _limitMin.x)
+        if (Input.mousePosition.x < _limitMin.x && Input.mousePosition.x > 0)
         {
-            transform.position += Vector3.left * (_speed * Time.deltaTime);
+            transform.position += Vector3.left * (Speed * Time.deltaTime);
         }
-        else if(Input.mousePosition.x > _limitMax.x)
+        else if(Input.mousePosition.x > _limitMax.x && Input.mousePosition.x < Screen.width)
         {
-            transform.position -= Vector3.left * (_speed * Time.deltaTime);
+            transform.position -= Vector3.left * (Speed * Time.deltaTime);
         }
 
-        if (Input.mousePosition.y < _limitMin.y)
+        if (Input.mousePosition.y < _limitMin.y && Input.mousePosition.y > 0 )
         {
-            transform.position += Vector3.back * (_speed * Time.deltaTime);
+            transform.position += Vector3.back * (Speed * Time.deltaTime);
         }
-        else if (Input.mousePosition.y > _limitMax.y)
+        else if (Input.mousePosition.y > _limitMax.y && Input.mousePosition.y < Screen.height)
         {
-            transform.position -= Vector3.back * (_speed * Time.deltaTime);
+            transform.position -= Vector3.back * (Speed * Time.deltaTime);
         }
     }
 }

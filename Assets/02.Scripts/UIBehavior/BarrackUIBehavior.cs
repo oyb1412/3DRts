@@ -12,5 +12,4 @@ public class BarrackUIBehavior : IUIBehavior
         }
         panels[UIBehaviourPanelController.Panels.BarrackPanel.ToString()].gameObject.SetActive(true);
     }
-
 }

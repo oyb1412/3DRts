@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class UIHpBar : MonoBehaviour
@@ -8,9 +9,10 @@ public class UIHpBar : MonoBehaviour
     private float _originalSizeX;
     private float _originalSizeY;
     private Collider _col;
+
     private void Start()
     {
-        _original = transform.root;
+        _original = transform.parent;
         _renderer = GetComponent<SpriteRenderer>();
         _parent = GetComponentInParent<IHit>();
         _col = _original.GetComponent<Collider>();

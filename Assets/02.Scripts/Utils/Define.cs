@@ -2,8 +2,8 @@ public class Define
 {
     public enum BuildList
     {
-        Castle,
         Barrack,
+        Tower,
     }
  
     public enum MouseEventType
@@ -38,6 +38,7 @@ public class Define
         Monster,
         Player,
         Building,
+        Mine,
     }
 
     public enum Cursor
@@ -45,5 +46,11 @@ public class Define
         Main,
         Attack,
         Patrol,
+    }
+    
+    public struct UnitCreatePos
+    {
+        public int X;
+        public int Z;
     }
 }

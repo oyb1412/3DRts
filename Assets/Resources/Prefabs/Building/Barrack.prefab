@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &788163703359721092
 Transform:
@@ -102,7 +102,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6226812011507505775
 Transform:
@@ -199,12 +199,13 @@ GameObject:
   - component: {fileID: 3502417945895422905}
   - component: {fileID: 4103905705607779802}
   - component: {fileID: 2339039695890063126}
+  - component: {fileID: 4502914341592323982}
   m_Layer: 9
   m_Name: Barrack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4598066023090267844
 Transform:
@@ -323,6 +324,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MyStatus: {fileID: 0}
+--- !u!208 &4502914341592323982
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6219221833837811503}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 2.956, y: 1.7260001, z: 3.028}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 1.7190001, z: -0.296}
+  m_TimeToStationary: 0.5
 --- !u!1 &8466632308665275338
 GameObject:
   m_ObjectHideFlags: 0
@@ -339,7 +356,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1021613004508936545
 Transform:

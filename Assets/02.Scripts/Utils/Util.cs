@@ -19,6 +19,21 @@ public class Util : MonoBehaviour
         return null;
     }
 
+    public static Define.UnitCreatePos[,] SetBuildingUnitCreatePos(MeshRenderer mesh, Transform tr)
+    {
+        int sizeX = Mathf.FloorToInt(mesh.bounds.size.x);
+        int sizeZ = Mathf.FloorToInt(mesh.bounds.size.z);
+        Define.UnitCreatePos[,] pos = new Define.UnitCreatePos[sizeX, sizeZ];
+        for (int z = 0; z < pos.GetLength(0); z++)
+        {
+            for (int x = 0; x < pos.GetLength(1); x++)
+            {
+                pos[z, x].X = Mathf.FloorToInt(tr.position.x + x - (sizeX * 0.5f));
+                pos[z, x].Z = Mathf.FloorToInt(tr.position.z - z - (sizeZ * 0.5f));
+            }
+        }
+        return pos;
+    }
     public static T GetOrAddComponent<T>(GameObject go) where T : Component
     {
         var component = go.GetComponent<T>();

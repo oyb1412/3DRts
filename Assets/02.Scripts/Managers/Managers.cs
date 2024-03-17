@@ -48,10 +48,10 @@ public class Managers : MonoBehaviour
             DontDestroyOnLoad(managers);
             _instance = managers.GetComponent<Managers>();
             
+            Game.Init();
             Pool.Init();
             Cursor.Init();
             Build.Init();
-            _game.Init();
         }
     }
     

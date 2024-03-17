@@ -14,7 +14,7 @@
             if (targetDir <= unit.LockTarget.GetComponent<MeshRenderer>().bounds.size.x)
             {
                 unit.transform.LookAt(unit.LockTarget.transform.position);
-                unit.LockTarget.GetComponent<BuildingBase>().SetCreate(unit.gameObject);
+                unit.LockTarget.GetComponent<BuildingBase>().SetBuilding(unit.gameObject);
                 unit.SetState(new BuildState());
             }
             else

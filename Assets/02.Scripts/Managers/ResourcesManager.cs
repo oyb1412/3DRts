@@ -5,7 +5,7 @@ using Object = UnityEngine.Object;
 
 public class ResourcesManager 
 {
-    private Object Load<T>(string path) where T : Object
+    public Object Load<T>(string path) where T : Object
     {
         if (typeof(T) != typeof(GameObject)) return Resources.Load<T>(path);
         string name = path;
@@ -37,6 +37,8 @@ public class ResourcesManager
         go.name = obj.name;
         return go;
     }
+    
+    
 
     public void Release(GameObject go)
     {

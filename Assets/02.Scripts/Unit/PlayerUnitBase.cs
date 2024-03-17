@@ -68,9 +68,9 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
         Status = Util.GetOrAddComponent<UnitStatus>(gameObject);
         Nma = GetComponent<NavMeshAgent>();
         _anime = GetComponent<Animator>();
-        Status.MoveSpeed = 10;
+        Status.MoveSpeed = 4;
         Status.Hp = 50;
-        Status.AttackPower = 5;
+        Status.AttackDamage = 5;
         Status.AttackRange = 2;
         Status.MaxHp = 50;
         Nma.speed = Status.MoveSpeed;
@@ -94,7 +94,9 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
             case MoveState:
             case PatrolState:
             case BuildMoveState:
+            case DigMoveState:
             {
+                Nma.enabled = true;
                 _anime.CrossFade("Move", .2f);
             }
                 break;
@@ -124,14 +126,19 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
                 _anime.CrossFade("Build", .2f);
             }
                 break;
+            case DigState:
+            {
+                _anime.CrossFade("Dig", .2f);
+            }
+                break;
         }
         CurrentState = newState;
     }
     
     
-    public void Hit(UnitStatus status)
+    public void Hit(BaseStatus status)
     {
-        int attack = Mathf.Max(status.AttackPower - Status.Defense, 1);
+        int attack = Mathf.Max(status.AttackDamage - Status.Defense, 1);
         Status.Hp -= attack;
         OnHpEvent?.Invoke(Status.Hp / Status.MaxHp);
         if (Status.Hp <= 0)

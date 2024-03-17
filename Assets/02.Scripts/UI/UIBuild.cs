@@ -7,9 +7,7 @@ public class UIBuild : UIBase
     private enum BuildBtns
     {
         BarrackBtn,
-        CastleBtn,
         TowerBtn,
-        CanselBtn,
     }
     
     private List<Button> _buildBtns = new List<Button>();
@@ -24,8 +22,6 @@ public class UIBuild : UIBase
         }
         
         _buildBtns[(int)BuildBtns.BarrackBtn].onClick.AddListener(() => Managers.Build.BuildShadow(Define.BuildList.Barrack));
-        //_buildBtns[(int)BuildBtns.CastleBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickQ));
-        //_buildBtns[(int)BuildBtns.TowerBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickS));
-        _buildBtns[(int)BuildBtns.CanselBtn].onClick.AddListener(() => Managers.Instance.UIBehaviourPanel.HideUI());
+        _buildBtns[(int)BuildBtns.TowerBtn].onClick.AddListener(() => Managers.Build.BuildShadow(Define.BuildList.Tower));
     }
 }

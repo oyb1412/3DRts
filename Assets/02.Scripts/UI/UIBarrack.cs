@@ -6,7 +6,6 @@ public class UIBarrack : UIBase
 {
     private enum AttackerBtns
     {
-       CreateWorkerBtn,
        CreateSwordManBtn,
        CreateArcherBtn,
     }
@@ -22,10 +21,9 @@ public class UIBarrack : UIBase
             _barrackBtns.Add(Get<Button>(i).GetComponent<Button>());
         }
         
-        //todo
-        //유닛 생성
-        //_barrackBtns[(int)AttackerBtns.CreateWorker].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickA));
-        //_barrackBtns[(int)AttackerBtns.CreateSwordMan].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickQ));
-        //_barrackBtns[(int)AttackerBtns.CreateArcher].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickS));
+        _barrackBtns[(int)AttackerBtns.CreateSwordManBtn].onClick.AddListener(
+            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<IUnitProducer>().SetCreating((int)AttackerBtns.CreateSwordManBtn));
+        _barrackBtns[(int)AttackerBtns.CreateArcherBtn].onClick.AddListener(
+            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<IUnitProducer>().SetCreating((int)AttackerBtns.CreateArcherBtn));
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UnitController : MonoBehaviour
@@ -15,12 +16,10 @@ public class UnitController : MonoBehaviour
     }
     public List<PlayerUnitBase> SelectUnit = new List<PlayerUnitBase>();
     public BuildingBase SelectBuilding;
-    private PlayerUnitBase _lastSelectUnit;
-    private PlayerUnitBase _lastSelectEnemy;
     public Action<IUIBehavior> BehaviourUIEvent;
-    private State _myState = State.None;
+    [SerializeField]private State _myState = State.None;
     
-    private void Start()
+    private void Awake()
     {
         Managers.Input.OnMouseEvent += UnitSelectEvent; 
         Managers.Input.OnMouseEvent += UnitAttackAndMoveEvent;
@@ -59,7 +58,8 @@ public class UnitController : MonoBehaviour
         if (_myState is State.ClickA or State.ClickQ)
             return;
 
-
+        if (Managers.Build.CurrentBuilding)
+            return;
         
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         int mask = (1 << (int)Define.Layer.Player) | (1 << (int)Define.Layer.Monster) | (1 << (int)Define.Layer.Building);
@@ -72,30 +72,9 @@ public class UnitController : MonoBehaviour
                 if (rayCastHit)
                 {
                     PlayerUnitBase player = hit.collider.GetComponent<PlayerUnitBase>();
-                    PlayerUnitBase enemy = hit.collider.GetComponent<PlayerUnitBase>();
                     BuildingBase building = hit.collider.GetComponent<BuildingBase>();
                     if (player)
                     {
-                        if (_lastSelectEnemy != null)
-                        {
-                            _lastSelectEnemy.MySelect = Define.Select.Deselect;
-                            _lastSelectEnemy = null;
-                            SelectedUnit(hit);
-                            DeSelectedBuilding();
-                        }
-                        //마지막으로 선택한 유닛이 존재하고
-                        //마지막으로 선택한 유닛과 새롭게 선택한 유닛의 종류가 같다면,
-                        if (_lastSelectUnit != null && player == _lastSelectUnit)
-                        {
-                            //일정 범위내의 그 종류의 유닛을 모두 선택한다.
-                            PlayerUnitBase[] players = Util.SelectedAutoUnits(_lastSelectUnit, _lastSelectUnit.MyType, 30f, 12);
-                            SelectedUnits(players);
-                            DeSelectedBuilding();
-                            _lastSelectUnit = null;
-                            return;
-                        }
-                        //마지막으로 선택한 유닛을 저장한다.
-                        _lastSelectUnit = player;
                         //아무도 선택되어있지 않다면 새롭게 선택한다.
                         if (SelectUnit.Count == 0)
                         {
@@ -111,27 +90,16 @@ public class UnitController : MonoBehaviour
                         }
                         return;
                     }
-                    if (enemy)
-                    {
-                        DeSelectedUnit();
-                        DeSelectedBuilding();
-                        _lastSelectEnemy = enemy;
-                        _lastSelectEnemy.MySelect = Define.Select.Select;
-                        return;
-                    }
+                    
                     if (building)
                     {
-                        SelectedBuilding(hit);
+                        DeSelectedBuilding();
                         DeSelectedUnit();
+                        SelectedBuilding(hit);
+
                     }
                 }
-                else if(_lastSelectEnemy != null)
-                {
-                    _lastSelectEnemy.MySelect = Define.Select.Deselect;
-                    _lastSelectEnemy = null;
-                    DeSelectedUnit();
-                    DeSelectedBuilding();
-                }
+
                 else
                 {
                     DeSelectedUnit();
@@ -217,14 +185,13 @@ public class UnitController : MonoBehaviour
     
     private void UnitAttackAndMoveEvent(Define.MouseEventType type)
     {       
-        if (SelectUnit.Count == 0 || _myState == State.ClickA)
+        if (SelectUnit.Count == 0)
             return;
-        
-        
+
         
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Debug.DrawRay(Camera.main.transform.position,ray.direction * 100f,Color.red,1f);
-        int mask =  (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster);
+        int mask =  (1 << (int)Define.Layer.Ground) | (1 << (int)Define.Layer.Monster) | (1 << (int)Define.Layer.Mine);
         bool rayCastHit = Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, mask);
         if (!rayCastHit || type != Define.MouseEventType.RightClick) return;
         switch (hit.collider.gameObject.layer)
@@ -250,7 +217,23 @@ public class UnitController : MonoBehaviour
 
                 break;
             }
+            case (int)Define.Layer.Mine:
+            {
+                //todo
+                //선택중인 유닛중 워커가 0명이면 리턴
+                var worker = SelectUnit.FindAll(x => x.MyType == PlayerUnitBase.Type.Worker);
+                if (worker.Count == 0)
+                    return;
+
+                foreach (var t in worker)
+                {
+                    t.LockTarget = hit.collider.gameObject;
+                    t.SetState(new DigMoveState());
+                }
+            }
+                break;
         }
+        _myState = State.None;
     }
 
     private List<Vector3> GetPositionListAround(Vector3 startPosition, float distance, int positionCount)
@@ -341,19 +324,6 @@ public class UnitController : MonoBehaviour
         if (!rayCastHit || type != Define.MouseEventType.LeftClick) return;
         switch (_myState)
         {
-            case State.ClickA when hit.collider.gameObject.layer == (int)Define.Layer.Ground:
-            {
-                List<Vector3> targetPositionList =
-                    GetPositionListAround(hit.point, new float[] { 3f, 6f, 9f }, new int[] { 5, 10, 20 });
-                int targetPositionListIndex = 0;
-                foreach (PlayerUnitBase player in SelectUnit)
-                {
-                    player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new PatrolState());
-                    targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
-                }
-
-                break;
-            }
             case State.ClickA:
             {
                 if (hit.collider.gameObject.layer == (int)Define.Layer.Monster)
@@ -361,6 +331,17 @@ public class UnitController : MonoBehaviour
                     foreach (PlayerUnitBase player in SelectUnit)
                     {
                         player.PlayerUnitAttack(hit.collider.gameObject, new MoveState());
+                    }
+                }
+                else if (hit.collider.gameObject.layer == (int)Define.Layer.Ground)
+                {
+                    List<Vector3> targetPositionList =
+                        GetPositionListAround(hit.point, new float[] { 3f, 6f, 9f }, new int[] { 5, 10, 20 });
+                    int targetPositionListIndex = 0;
+                    foreach (PlayerUnitBase player in SelectUnit)
+                    {
+                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new PatrolState());
+                        targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
                     }
                 }
 
