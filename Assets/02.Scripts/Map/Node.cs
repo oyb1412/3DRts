@@ -19,6 +19,7 @@ public struct NodeData
 {
     public InteractableTypes BnteractableTypes;
     public bool isTrigger;
+    public bool HasBeenSeen;
     public int X;
     public int Z;
 }
@@ -48,9 +49,44 @@ public class Node : MonoBehaviour
             return;
         
         Buildings[x, z].isTrigger = trigger;
-        Managers.Instance.MiniMap.UpdateMinimap(x, z, color);
 
     }
+    
+    public void UpdateNodesColor(Transform tr, float siteRange)
+    {
+        Color[] colors = Managers.Instance.MiniMap.MinimapTexture.GetPixels();
+        
+        bool isUpdate = false;
+        for (int z = 0; z < Buildings.GetLength(0); z++)
+        {
+            for (int x = 0; x < Buildings.GetLength(1); x++)
+            {
+                float dis = (new Vector3(Buildings[z, x].X, 2f, Buildings[z, x].Z) - tr.position).magnitude;
+                if (dis > siteRange)
+                {
+                    if(!Buildings[z, x].HasBeenSeen)
+                        continue;
+                    
+                    colors[z * Buildings.GetLength(0) + x] = new Color(1f,0f,0f,0.5f);
+                    isUpdate = true;
+                }
+                else 
+                {
+                    if(Buildings[z, x].isTrigger)
+                        continue;
+                    
+                    Buildings[z, x].isTrigger = true;
+                    Buildings[z, x].HasBeenSeen = true;
+                    colors[z * Buildings.GetLength(0) + x] = Color.clear; 
+                    isUpdate = true;
+                }
+            }
+        }
+        
+        if(isUpdate)
+            Managers.Instance.MiniMap.UpdateMinimap(colors);
+    }
+
     
     public void SetNode(GameObject go)
     {

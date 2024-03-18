@@ -12,7 +12,7 @@ public class UIMinimap : UIBase
     }
    
     private List<RawImage> _rawImages = new List<RawImage>();
-    private Texture2D _minimapTexture;
+    public Texture2D MinimapTexture;
     private Color[] clearMap;
     private void Start()
     {
@@ -24,24 +24,24 @@ public class UIMinimap : UIBase
         }
 
         var node = Managers.Instance.Node;
-        _minimapTexture = new Texture2D(node.Buildings.GetLength(0), node.Buildings.GetLength(1));
+        MinimapTexture = new Texture2D(node.Buildings.GetLength(0), node.Buildings.GetLength(1));
         clearMap = new Color[node.Buildings.GetLength(0) * node.Buildings.GetLength(1)];
         for (int i = 0; i < clearMap.Length; i++)
         {
            clearMap[i] = Color.black;
         }
-        _minimapTexture.SetPixels(clearMap);
-        _minimapTexture.Apply();
+        MinimapTexture.SetPixels(clearMap);
+        MinimapTexture.Apply();
 
-        _rawImages[(int)RawImages.MinimapRawImage].texture = _minimapTexture;
+        _rawImages[(int)RawImages.MinimapRawImage].texture = MinimapTexture;
     }
 
     //todo
     //한번이라도 밝힌적이 있나 없나 trigger지정 
     //유닛 주변이 아닌곳은 if문으로 trigger체크후, false면 블랙, true면 그레이로 지정
-    public void UpdateMinimap(int x, int y, Color color)
+    public void UpdateMinimap(Color[] color)
     {
-        _minimapTexture.SetPixel(x, y, color);
-        _minimapTexture.Apply();
+        MinimapTexture.SetPixels(color);
+        MinimapTexture.Apply(false);
     }
 }

@@ -91,14 +91,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
             return;
         
         var node = Managers.Instance.Node;
-        
-        foreach (var t in node.Buildings)
-        {
-            if (Vector3.Distance(transform.position, new Vector3(t.X, 2f, t.Z)) < SiteRange)
-            {
-                node.SetNodeColor(t.X, t.Z, Color.clear, true);
-            }
-        }
+        node.UpdateNodesColor(transform, SiteRange);
 
         SiteTime = 0;
     }
