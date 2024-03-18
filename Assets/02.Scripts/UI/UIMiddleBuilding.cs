@@ -27,7 +27,7 @@ public class UIMiddleBuilding : UIBase
 
     private enum BuildingSliders
     {
-        BuildingSlider
+        BuildingSlider,
     }
     
     private List<Image> _singleImages = new List<Image>();
@@ -62,10 +62,6 @@ public class UIMiddleBuilding : UIBase
         if (!go)
             return;
         
-        //todo
-        //createSlider와 buildingSlider 나누기.
-        //시작시 disable로 모든 ui 비활성화.
-        //타워 선택시 ui활성화 필요
         BuildingBase building = go.GetComponent<BuildingBase>();
         
         building.OnHpEvent += (hp =>

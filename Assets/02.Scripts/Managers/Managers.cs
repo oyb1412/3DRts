@@ -14,6 +14,7 @@ public class Managers : MonoBehaviour
     private SceneManagerEx _scene = new SceneManagerEx();
     public UnitController UnitController;
     public Node Node;
+    public UIMinimap MiniMap;
     public UIBehaviourPanelController UIBehaviourPanel;
     public UIMiddleStateController UIMiddleStatePanel;
     public static CursorManager Cursor => _instance._cursor;

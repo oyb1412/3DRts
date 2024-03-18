@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Serialization;
@@ -51,6 +52,8 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
     public IUnitState CurrentState;
     private GameObject _selectMarker;
     private GameObject _hpBar;
+    private float SiteRange = 10f;
+    private float SiteTime = 1f;
     [HideInInspector]public float ScanRange = 5f;
 
     public Action<float> OnHpEvent { get; set; }
@@ -81,6 +84,23 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
     void Update()
     {
         CurrentState.OnUpdate(this);
+
+        SiteTime += Time.deltaTime;
+
+        if (SiteTime < 1)
+            return;
+        
+        var node = Managers.Instance.Node;
+        
+        foreach (var t in node.Buildings)
+        {
+            if (Vector3.Distance(transform.position, new Vector3(t.X, 2f, t.Z)) < SiteRange)
+            {
+                node.SetNodeColor(t.X, t.Z, Color.clear, true);
+            }
+        }
+
+        SiteTime = 0;
     }
     protected abstract void OnAttackEvent();
     public void OnDieEvent()

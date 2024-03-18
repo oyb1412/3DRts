@@ -8,9 +8,17 @@ public enum InteractableTypes
     Building,
     Mineral,
 }
+
+public enum RevealedTypes
+{
+    Black,
+    Gray,
+    White
+}
 public struct NodeData
 {
     public InteractableTypes BnteractableTypes;
+    public bool isTrigger;
     public int X;
     public int Z;
 }
@@ -33,7 +41,17 @@ public class Node : MonoBehaviour
             }
         }
     }
+    
+    public void SetNodeColor(int x, int z, Color color, bool trigger)
+    {
+        if (Buildings[x, z].isTrigger)
+            return;
+        
+        Buildings[x, z].isTrigger = trigger;
+        Managers.Instance.MiniMap.UpdateMinimap(x, z, color);
 
+    }
+    
     public void SetNode(GameObject go)
     {
         Util.MyRect bound;
@@ -42,9 +60,10 @@ public class Node : MonoBehaviour
         bound.MaxX = go.transform.position.x + currentMesh.bounds.size.x / 2;
         bound.MinZ = go.transform.position.z - currentMesh.bounds.size.z / 2;
         bound.MaxZ = go.transform.position.z + currentMesh.bounds.size.z / 2;
-        
         SetNode(bound);
     }
+
+  
     
     public void SetNode(Util.MyRect bound)
     {

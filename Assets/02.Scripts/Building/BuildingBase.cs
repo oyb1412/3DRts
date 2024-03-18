@@ -49,6 +49,8 @@ public abstract class BuildingBase : MonoBehaviour, IHit, IUIBehavior, IInstalla
     private GameObject _hpBar;
     private Define.Select _select;
     private NavMeshObstacle _nmo;
+    private float SiteRange = 10f;
+    private float SiteTime = 1f;
     [HideInInspector]public BuildingStatus MyStatus;
     
     public Action<float> OnHpEvent { get; set; }
@@ -103,6 +105,23 @@ public abstract class BuildingBase : MonoBehaviour, IHit, IUIBehavior, IInstalla
     private void Update()
     {
         BuildState.OnUpdate(this);
+        
+        SiteTime += Time.deltaTime;
+
+        if (SiteTime < 1)
+            return;
+        
+        var node = Managers.Instance.Node;
+        
+        foreach (var t in node.Buildings)
+        {
+            if (Vector3.Distance(transform.position, new Vector3(t.X, 2f, t.Z)) < SiteRange)
+            {
+                node.SetNodeColor(t.X, t.Z, Color.clear, true);
+            }
+        }
+
+        SiteTime = 0;
     }
 
 

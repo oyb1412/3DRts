@@ -19,13 +19,16 @@ public class UIMiddleStateController : UIBase
     {
         Bind<GameObject>(typeof(Panels));
         int count = 0;
+        
         foreach (var value in Enum.GetValues(typeof(Panels)))
         {
             string panelName = Enum.GetName(typeof(Panels), value);
-            _panels.Add(panelName, Get(count));
+            _panels.TryAdd(panelName, Get(count));
             _panels[panelName].gameObject.SetActive(false);
             count++;
         }
+
+        var q = _panels;
         
         Managers.Instance.UnitController.MiddleBehaviourUIEvent += SetBehaviourBtn;
         Managers.Build.CancelBuild += HideUI;

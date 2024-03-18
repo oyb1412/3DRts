@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+
 
 public class BuildingCreateState : IBuildingState
 {
     private Queue<int> _creatingUnitNumbers =new Queue<int>();
+
     public BuildingCreateState(int index)
     {
         _creatingUnitNumbers.Enqueue(index);
@@ -26,6 +30,7 @@ public class BuildingCreateState : IBuildingState
         building.CurrentCreateTime += Time.deltaTime;
         unit.OnCreateSliderEvent?.Invoke(building.CurrentCreateTime / building.MaxCreateTime);
         unit.OnCreateImageEvent?.Invoke(building.CurrentCreateNumber);
+
         while (_creatingUnitNumbers.Count > 0 &&
                building.CurrentCreateTime >= building.MaxCreateTime)
         {
