@@ -12,5 +12,4 @@ public class AttackerUIBehavior : IUIBehavior
         }
         panels[UIBehaviourPanelController.Panels.AttackerPanel.ToString()].gameObject.SetActive(true);
     }
-
 }

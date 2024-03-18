@@ -61,6 +61,7 @@ public class BuildManager
                 if (_canBuild)
                 {
                     Managers.Instance.Node.SetNode(_bound);
+                    CurrentBuilding.GetComponent<BuildingBase>().Init();
                     _building.Add(CurrentBuilding);
                     _worker.SetBuildState(CurrentBuilding);
                     Managers.Game.SetGoldEvent(50);

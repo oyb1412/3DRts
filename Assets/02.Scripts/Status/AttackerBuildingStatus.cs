@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackerBuildingStatus : BaseStatus
+public class AttackerBuildingStatus : BaseStatus , IAttackerStatus
 {
     public float AttackSpeed { get; set; }
     public float AttackRange { get; set; }
-    public override int AttackDamage { get; set; }
+    public int AttackDamage { get; set; }
 }

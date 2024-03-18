@@ -1,5 +1,10 @@
 public class MoveState : IUnitState
 {
+    public MoveState(PlayerUnitBase unit)
+    {
+        unit.Nma.enabled = true;
+        unit.Anime.CrossFade("Move", .2f);
+    }
     public void OnUpdate(PlayerUnitBase unit)
     {
         if (unit.LockTarget)
@@ -8,7 +13,7 @@ public class MoveState : IUnitState
             float targetDir = (unit.LockTarget.transform.position - unit.transform.position).magnitude;
             if (targetDir <= unit.Status.AttackRange)
             {
-                unit.SetState(new AttackState());
+                unit.SetState(new AttackState(unit));
             }
             else
             {
@@ -21,7 +26,7 @@ public class MoveState : IUnitState
             float dir = (unit.DestPos - unit.transform.position).magnitude;
             if (dir <= 0.1f)
             {
-                unit.SetState(new IdleState());
+                unit.SetState(new IdleState(unit));
             }
             else
             {

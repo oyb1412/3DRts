@@ -8,36 +8,60 @@ public class CastleController : BuildingBase, IUnitProducer
 
     public MeshRenderer Mesh { get; set; }
     public Define.UnitCreatePos[,] Bound { get; set; }
-    
+    public float CurrentCreateTime { get; set; }
+    public float MaxCreateTime { get; set; }
+    public int CurrentCreateNumber { get; set; }
+    public int MaxCreateNumber { get; set; }
+
     protected override void Start()
     {
+        base.Start();
+        
+        CurrentCreateNumber = 0;
+        MaxCreateNumber = 5;
+        MaxCreateTime = 10f;
+        CurrentCreateTime = 0;
         UIBehavior = new CastleUIBehavior();
+        Mesh = GetComponent<MeshRenderer>();
         GameObject go = Resources.Load<GameObject>("Prefabs/Unit/Worker");
         Units.Add(go);
-        Mesh = GetComponent<MeshRenderer>();
         Bound = Util.SetBuildingUnitCreatePos(Mesh, transform);
     }
 
+    public override void Init()
+    {
+        
+    }
 
     public void SetCreating(int index)
     {
-        foreach (Define.UnitCreatePos t in Bound)
+        //건물 건설중일땐 리턴
+        if (BuildState is BuildingBuildState)
+            return;
+
+        //현재 생성중인 유닛이 동시에 생성가능한 최대 유닛보다 많으면 리턴
+        if (CurrentCreateNumber >= MaxCreateNumber)
         {
-            int mask = (1 << (int)Define.Layer.Player) | (1 << (int)Define.Layer.Monster) | (1 << (int)Define.Layer.Building) |  (1 << (int)Define.Layer.Mine);
-            var rayCastHit = Physics.OverlapSphere(new Vector3(t.X, 2f, t.Z), 1f, mask);
-            if (rayCastHit.Length == 0)
-            {
-                GameObject unit = Managers.Resources.Activation($"Unit/{Units[index].name}", null);
-                unit.transform.position = new Vector3(t.X, 2f, t.Z);
-                
-                //todo
-                //유닛 큐에 넣고 스테이트 변경
-                //while로 큐에 유닛이 존재하면 유닛 계속 생성
-                //각종 데이터 슬슬 따로 보관
-                break;
-            }
+            Debug.Log("생성가능 유닛 자리 없음");
+            return;
         }
-        Debug.Log("유닛을 생성할 공간이 없습니다.");
+
+        CurrentCreateNumber++;
+
+        //이미 state가 create면 그 state를 사용
+        if (BuildState is BuildingCreateState build)
+        {
+            OnCreateStartEvent?.Invoke();
+            build.SetQueue(index);
+        }
+        //첫 생성이면 state새롭게 생성
+        else
+        {
+            OnCreateStartEvent?.Invoke();
+            BuildState = new BuildingCreateState(index);
+        }
+        
+
     }
 
 }

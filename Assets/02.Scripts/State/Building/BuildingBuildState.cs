@@ -4,10 +4,10 @@ public class BuildingBuildState : IBuildingState
 {
     public void OnUpdate(BuildingBase unit)
     {
-        unit.MyStatus.Hp += 5 * Time.deltaTime;
-        unit.OnHpEvent?.Invoke(unit.MyStatus.Hp);
+        unit.MyStatus.CurrentBuildingTime += Time.deltaTime;
+        unit.OnBuildEvent?.Invoke(unit.MyStatus.CurrentBuildingTime / unit.MyStatus.MaxBuildingTime);
 
-        if (unit.MyStatus.Hp < unit.MyStatus.MaxHp) 
+        if (unit.MyStatus.CurrentBuildingTime < unit.MyStatus.MaxBuildingTime) 
             return;
 
         if (unit.MyType == BuildingBase.BuildingType.Tower)
@@ -15,6 +15,7 @@ public class BuildingBuildState : IBuildingState
         else
             unit.BuildState = new BuildingIdleState();
         
-        unit._myWorker.SetState(new IdleState());
+        
+        unit.Worker.SetState(new IdleState(unit.Worker));
     }
 }

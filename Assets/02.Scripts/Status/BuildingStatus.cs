@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class BuildingStatus : BaseStatus
 {
-    public override int AttackDamage { get; set; }
+    public float CurrentBuildingTime { get; set; }
+    public float MaxBuildingTime { get; set; }
 }

@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitStatus : BaseStatus
+public class UnitStatus : BaseStatus, IAttackerStatus
 {
-    public float AttackRange { get; set; }
     public float MoveSpeed { get; set; }
-    public override int AttackDamage { get; set; }
+    
+    public float AttackSpeed { get; set; }
+    public float AttackRange { get; set; }
+    public int AttackDamage { get; set; }
 }

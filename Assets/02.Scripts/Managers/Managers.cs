@@ -15,6 +15,7 @@ public class Managers : MonoBehaviour
     public UnitController UnitController;
     public Node Node;
     public UIBehaviourPanelController UIBehaviourPanel;
+    public UIMiddleStateController UIMiddleStatePanel;
     public static CursorManager Cursor => _instance._cursor;
     public static PoolManager Pool => _instance._pool;
     public static SceneManagerEx Scene => _instance._scene;

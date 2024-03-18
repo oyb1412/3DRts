@@ -3,6 +3,7 @@ using UnityEngine;
 public class ArcherController : PlayerUnitBase,  IAttacker
 {
     private GameObject _firePos;
+    
     protected override void Start()
     {
         base.Start();

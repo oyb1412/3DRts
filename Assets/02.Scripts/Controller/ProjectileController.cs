@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class ProjectileController : MonoBehaviour
 {
-    private BaseStatus _status;
+    private IAttackerStatus _status;
     private GameObject _target;
     private Vector3 _dir;
     [SerializeField] private float _speed;
 
-    public void Init(GameObject target,Vector3 pos, BaseStatus status)
+    public void Init(GameObject target,Vector3 pos, IAttackerStatus status)
     {
         transform.position = pos;
         _dir = (target.transform.position - transform.position).normalized;

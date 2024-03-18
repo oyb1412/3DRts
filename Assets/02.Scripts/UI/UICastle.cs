@@ -17,11 +17,8 @@ public class UICastle : UIBase
         Bind<Button>(typeof(CastleBtns));
         _castleBtns = Get<Button>((int)CastleBtns.CreateWorkerBtn).GetComponent<Button>();
 
-        //todo
-        //유닛 생성
+
         _castleBtns.onClick.AddListener(
             () => Managers.Instance.UnitController.SelectBuilding.GetComponent<IUnitProducer>().SetCreating((int)CastleBtns.CreateWorkerBtn));
-        _castleBtns.onClick.AddListener(
-            () => Debug.Log("111"));
     }
 }

@@ -8,6 +8,11 @@ using UnityEngine;
 public class DigState : IUnitState
 {
     private float _digTimer;
+
+    public DigState(PlayerUnitBase unit)
+    {
+        unit.Anime.CrossFade("Dig", .2f);
+    }
     public void OnUpdate(PlayerUnitBase unit)
     {
         _digTimer += Time.deltaTime;

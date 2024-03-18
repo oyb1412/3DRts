@@ -11,5 +11,6 @@ public class BuilderUIBehavior : IUIBehavior
             t.Value.gameObject.SetActive(false);
         }
         panels[UIBehaviourPanelController.Panels.WorkerPanel.ToString()].gameObject.SetActive(true);
+        
     }
 }

@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
+public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUnit
 {
     public enum Type
     {
@@ -46,8 +47,8 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
     [HideInInspector]public UnitStatus Status;
     
     [HideInInspector]public NavMeshAgent Nma;
-    private Animator _anime;
-    public IUnitState CurrentState = new IdleState();
+    public Animator Anime;
+    public IUnitState CurrentState;
     private GameObject _selectMarker;
     private GameObject _hpBar;
     [HideInInspector]public float ScanRange = 5f;
@@ -67,7 +68,8 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
     {
         Status = Util.GetOrAddComponent<UnitStatus>(gameObject);
         Nma = GetComponent<NavMeshAgent>();
-        _anime = GetComponent<Animator>();
+        Anime = GetComponent<Animator>();
+        CurrentState = new IdleState(this);
         Status.MoveSpeed = 4;
         Status.Hp = 50;
         Status.AttackDamage = 5;
@@ -89,61 +91,17 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
 
     public void SetState(IUnitState newState)
     {
-        switch (newState)
-        {
-            case MoveState:
-            case PatrolState:
-            case BuildMoveState:
-            case DigMoveState:
-            {
-                Nma.enabled = true;
-                _anime.CrossFade("Move", .2f);
-            }
-                break;
-            case IdleState:
-            case HoldState:
-            {
-                Nma.SetDestination(transform.position);
-                _anime.CrossFade("Idle", .2f);
-            }
-                break;
-            case AttackState:
-            {
-                Nma.SetDestination(transform.position);
-                _anime.CrossFade("Attack", .2f);
-            }
-                break;
-            case DieState:
-            {
-                GetComponent<Collider>().enabled = false;
-                Nma.SetDestination(transform.position);
-                _anime.CrossFade("Die", .2f);
-            }
-                break;
-            case BuildState:
-            {
-                Nma.SetDestination(transform.position);
-                _anime.CrossFade("Build", .2f);
-            }
-                break;
-            case DigState:
-            {
-                _anime.CrossFade("Dig", .2f);
-            }
-                break;
-        }
         CurrentState = newState;
     }
     
-    
-    public void Hit(BaseStatus status)
+    public void Hit(IAttackerStatus status)
     {
         int attack = Mathf.Max(status.AttackDamage - Status.Defense, 1);
         Status.Hp -= attack;
         OnHpEvent?.Invoke(Status.Hp / Status.MaxHp);
         if (Status.Hp <= 0)
         {
-            SetState(new DieState());
+            SetState(new DieState(this));
         }
     }
 
@@ -170,5 +128,15 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior
     {
         UIBehavior?.UpdateUI(panels);
 
+    }
+
+    public GameObject GetThisObject()
+    {
+        return gameObject;
+    }
+
+    public GameObject GetThisObjectType()
+    {
+        return gameObject;
     }
 }

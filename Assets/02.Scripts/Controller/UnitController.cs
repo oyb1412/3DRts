@@ -17,6 +17,7 @@ public class UnitController : MonoBehaviour
     public List<PlayerUnitBase> SelectUnit = new List<PlayerUnitBase>();
     public BuildingBase SelectBuilding;
     public Action<IUIBehavior> BehaviourUIEvent;
+    public Action<IMiddleUIBehavior, List<IAllUnit>> MiddleBehaviourUIEvent;
     [SerializeField]private State _myState = State.None;
     
     private void Awake()
@@ -30,16 +31,18 @@ public class UnitController : MonoBehaviour
     public void SetState(State state)
     {
         _myState = state;
-        if (state == State.ClickH)
+        
+        switch (state)
         {
-            SetAllUnitState(new HoldState());
-        }
-
-        if (state == State.ClickS)
-        {
-            SetAllUnitState(new IdleState());
+            case State.ClickH:
+                SetAllUnitHoldState();
+                break;
+            case State.ClickS:
+                SetAllUnitIdleState();
+                break;
         }
     }
+    
     private void OnUpdateState()
     {
         if (Input.GetKeyDown(KeyCode.S))
@@ -202,7 +205,7 @@ public class UnitController : MonoBehaviour
                 int targetPositionListIndex = 0;
                 foreach (PlayerUnitBase player in SelectUnit)
                 {
-                    player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new MoveState());
+                    player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new MoveState(player));
                     targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
                 }
 
@@ -212,7 +215,7 @@ public class UnitController : MonoBehaviour
             {
                 foreach (PlayerUnitBase player in SelectUnit)
                 {
-                    player.PlayerUnitAttack(hit.collider.gameObject, new MoveState());
+                    player.PlayerUnitAttack(hit.collider.gameObject, new MoveState(player));
                 }
 
                 break;
@@ -228,7 +231,7 @@ public class UnitController : MonoBehaviour
                 foreach (var t in worker)
                 {
                     t.LockTarget = hit.collider.gameObject;
-                    t.SetState(new DigMoveState());
+                    t.SetState(new DigMoveState(t));
                 }
             }
                 break;
@@ -286,14 +289,31 @@ public class UnitController : MonoBehaviour
         if (SelectBuilding != null)
         {
             BehaviourUIEvent?.Invoke(SelectBuilding);
+            MiddleBehaviourUIEvent?.Invoke(new BuildingUIBehavior(),
+                new List<IAllUnit>()
+                {
+                    SelectBuilding
+                });
             return;
         }
         
         if (SelectUnit.Count == 0)
         {
             BehaviourUIEvent?.Invoke(null);
+            MiddleBehaviourUIEvent?.Invoke(null, null);
             return;
         }
+
+        int count = 0;
+        foreach (PlayerUnitBase unit in SelectUnit)
+        {
+            count++;
+        }
+
+        if (count > 1)
+            MiddleBehaviourUIEvent?.Invoke(new MultiUIBehavior(), new List<IAllUnit>(SelectUnit));
+        else
+            MiddleBehaviourUIEvent?.Invoke(new SingleUIBehavior(), new List<IAllUnit>(SelectUnit));
         
         foreach (PlayerUnitBase unit in SelectUnit)
         {
@@ -330,7 +350,7 @@ public class UnitController : MonoBehaviour
                 {
                     foreach (PlayerUnitBase player in SelectUnit)
                     {
-                        player.PlayerUnitAttack(hit.collider.gameObject, new MoveState());
+                        player.PlayerUnitAttack(hit.collider.gameObject, new MoveState(player));
                     }
                 }
                 else if (hit.collider.gameObject.layer == (int)Define.Layer.Ground)
@@ -340,7 +360,7 @@ public class UnitController : MonoBehaviour
                     int targetPositionListIndex = 0;
                     foreach (PlayerUnitBase player in SelectUnit)
                     {
-                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new PatrolState());
+                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new PatrolState(player));
                         targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
                     }
                 }
@@ -356,7 +376,7 @@ public class UnitController : MonoBehaviour
                     int targetPositionListIndex = 0;
                     foreach (PlayerUnitBase player in SelectUnit)
                     {
-                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new MoveState());
+                        player.PlayerUnitMove(targetPositionList[targetPositionListIndex], new MoveState(player));
                         targetPositionListIndex = (targetPositionListIndex + 1) % targetPositionList.Count;
                     }
                 }
@@ -367,7 +387,7 @@ public class UnitController : MonoBehaviour
         _myState = State.None;
     }
 
-    private void SetAllUnitState(IUnitState state)
+    private void SetAllUnitHoldState()
     {
         if (SelectUnit.Count == 0)
             return;
@@ -377,9 +397,23 @@ public class UnitController : MonoBehaviour
             if(player.CurrentState is BuildState)
                 continue;
             
-            player.SetState(state);
+            player.SetState(new HoldState(player));
         }
+        CheckAllUnitType();
+    }
+    
+    private void SetAllUnitIdleState()
+    {
+        if (SelectUnit.Count == 0)
+            return;
 
+        foreach (PlayerUnitBase player in SelectUnit)
+        {
+            if(player.CurrentState is BuildState)
+                continue;
+            
+            player.SetState(new IdleState(player));
+        }
         CheckAllUnitType();
     }
 }
