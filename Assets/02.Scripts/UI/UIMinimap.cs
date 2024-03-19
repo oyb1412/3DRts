@@ -2,46 +2,76 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIMinimap : UIBase
+public class UIMinimap : UIMap
 {
-    public enum RawImages
+    [SerializeField]private CameraController Camera;
+    private enum RawImages
     {
         MinimapRawImage,
     }
-   
-    private List<RawImage> _rawImages = new List<RawImage>();
-    public Texture2D MinimapTexture;
-    private Color[] clearMap;
-    private void Start()
+
+    private enum Images
     {
-        Bind<RawImage>(typeof(RawImages));
-
-        for (int i = 0; i < Enum.GetValues(typeof(RawImages)).Length; i++)
-        {
-            _rawImages.Add(Get<RawImage>(i).GetComponent<RawImage>());
-        }
-
-        var node = Managers.Instance.Node;
-        MinimapTexture = new Texture2D(node.Buildings.GetLength(0), node.Buildings.GetLength(1));
-        clearMap = new Color[node.Buildings.GetLength(0) * node.Buildings.GetLength(1)];
-        for (int i = 0; i < clearMap.Length; i++)
-        {
-           clearMap[i] = Color.black;
-        }
-        MinimapTexture.SetPixels(clearMap);
-        MinimapTexture.Apply();
-
-        _rawImages[(int)RawImages.MinimapRawImage].texture = MinimapTexture;
+        MinimapIndicator,
     }
 
-    //todo
-    //한번이라도 밝힌적이 있나 없나 trigger지정 
-    //유닛 주변이 아닌곳은 if문으로 trigger체크후, false면 블랙, true면 그레이로 지정
-    public void UpdateMinimap(Color[] color)
+    private List<Image> _indicatorList = new List<Image>();
+    private RectTransform _indicatorRect;
+    protected override void Start()
     {
-        MinimapTexture.SetPixels(color);
-        MinimapTexture.Apply(false);
+        base.Start();
+        Bind<RawImage>(typeof(RawImages));
+        Bind<Image>(typeof(Images));
+        for (int i = 0; i < Enum.GetValues(typeof(RawImages)).Length; i++)
+        {
+            RawImage.Add(Get<RawImage>(i).GetComponent<RawImage>());
+        }
+        for (int i = 0; i < Enum.GetValues(typeof(Images)).Length; i++)
+        {
+            _indicatorList.Add(Get<Image>(i).GetComponent<Image>());
+        }
+        BindEvent(RawImage[(int)RawImages.MinimapRawImage].gameObject,ClickedIndicator,Define.MouseEventType.LeftClick);
+        _indicatorRect = _indicatorList[(int)Images.MinimapIndicator].GetComponent<RectTransform>();
+        RawImage[(int)RawImages.MinimapRawImage].texture = Texture;
+    }
+
+    private void ClickedIndicator(PointerEventData data)
+    {
+        Vector2 size = _indicatorRect.sizeDelta;
+        _indicatorRect.anchoredPosition = data.position - new Vector2(size.x / 4, size.y / 2);
+        
+        RectTransform miniMapRect = RawImage[(int)RawImages.MinimapRawImage].GetComponent<RectTransform>();
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(miniMapRect, data.position, null, out Vector2 localPoint);
+
+        Vector2 miniMapSize = miniMapRect.sizeDelta;
+        float xRatio = (localPoint.x + miniMapSize.x / 2) / miniMapSize.x;
+        float yRatio = (localPoint.y + miniMapSize.y / 2) / miniMapSize.y;
+        
+        float mapWidth = 100f; 
+        float mapHeight = 100f; 
+
+        Vector3 newPosition = new Vector3(
+            xRatio * mapWidth - mapWidth / 32, 
+            Camera.transform.position.y,     
+            yRatio * mapHeight - mapHeight / 4 
+        );
+
+        Camera.transform.position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
+
+    }
+    private void LateUpdate()
+    {
+        Vector3 cameraPos = Camera.transform.position - Camera.DefaultPos;
+
+        float xRatio = cameraPos.x  / Managers.Instance.Node.Nodes.GetLength(0);
+        float zRatio = cameraPos.z / Managers.Instance.Node.Nodes.GetLength(1);
+        float indicatorPosX = xRatio * GetComponentInParent<RectTransform>().anchoredPosition.x * (1080f / 1920f);
+        float indicatorPosZ = zRatio * GetComponentInParent<RectTransform>().anchoredPosition.y;
+        _indicatorRect.anchoredPosition =
+          new Vector2(indicatorPosX, indicatorPosZ);
     }
 }

@@ -17,31 +17,22 @@ public class BuildManager
     {
         _originalMaterial = Resources.Load<Material>("Material/BuildingOriginal");
         _redMaterial = Resources.Load<Material>("Material/BuildingRed");
-
         Managers.Input.OnMouseEvent += Create;
     }
     
     public void BuildShadow(Define.BuildList building)
     {
-        //선택중인 유닛 중에 빌더가 있는지
         var builders = Managers.Instance.UnitController.SelectUnit.FindAll(unit => unit is IBuilder);
 
         foreach (var item in builders)
         {
-            //빌더중에 buildstate가 아닌 빌더가 있는지
-            if (item.CurrentState is not BuildState)
-            {
-                //todo
-                //비용이 충분할 때만 설치 가능하도록
-                //if (build._myStatus.CreateCost <= Managers.Game.CurrentGold)
-                {
-                    CurrentBuilding = Managers.Resources.Activation($"Building/{building.ToString()}", null);
-                    _currentMesh = CurrentBuilding.GetComponent<MeshRenderer>();
-                    _worker = item as WorkerController;
-                    break;
-                    //Managers.Game.CurrentGold -= build._myStatus.CreateCost;
-                }
-            }
+            if (item.CurrentState is Unit.State.BuildState)
+                continue;
+            
+            CurrentBuilding = Managers.Resources.Activation($"Building/{building.ToString()}", null);
+            _currentMesh = CurrentBuilding.GetComponent<MeshRenderer>();
+            _worker = item as WorkerController;
+            break;
         }
     }
 
@@ -53,28 +44,67 @@ public class BuildManager
         switch (type)
         {
             case Define.MouseEventType.RightClick:
-                CancelBuild?.Invoke();
-                Managers.Resources.Release(CurrentBuilding);
-                CurrentBuilding = null;
+                CanselToCreate();
                 break;
             case Define.MouseEventType.LeftClick:
                 if (_canBuild)
-                {
-                    Managers.Instance.Node.SetNode(_bound);
-                    CurrentBuilding.GetComponent<BuildingBase>().Init();
-                    _building.Add(CurrentBuilding);
-                    _worker.SetBuildState(CurrentBuilding);
-                    Managers.Game.SetGoldEvent(50);
-                    CurrentBuilding = null;
-                }
+                    SuccessToCreate(50);
                 break;
         }
+    }
+
+    private void SuccessToCreate(int gold)
+    {
+        Managers.Instance.Node.SetNode(_bound);
+        Managers.Game.SetGoldEvent(50);
+        CurrentBuilding.GetComponent<BuildingBase>().Init();
+        _building.Add(CurrentBuilding);
+        _worker.SetBuildState(CurrentBuilding);
+        CurrentBuilding = null;
+    }
+    private void CanselToCreate()
+    {
+        CancelBuild?.Invoke();
+        Managers.Resources.Release(CurrentBuilding);
+        CurrentBuilding = null;
     }
     public void OnUpdate()
     {
         if (!CurrentBuilding)
             return;
+
+        SetBoundSize();
+
+        var units = Managers.Game.GetAllUnitList();
+        var node = Managers.Instance.Node.Nodes;
         
+        foreach (var t in units)
+        {
+            if (!_bound.Contains(t.transform.position.x, t.transform.position.z)) continue;
+            _currentMesh.material = _redMaterial;
+            return;
+        }
+        
+        foreach (var item in node)
+        {
+            if (!_bound.Contains(item.PosX, item.PosZ)) continue;
+            switch (item.NodeTypes)
+            {
+                case NodeTypes.Building:
+                    _canBuild = false;
+                    _currentMesh.material = _redMaterial;
+                    return;
+                case NodeTypes.None:
+                    _canBuild = true;
+                    _currentMesh.material = _originalMaterial;
+                    break;
+            }
+        }
+        
+    }
+
+    private void SetBoundSize()
+    {
         Vector3 mousePosition = Input.mousePosition;
         mousePosition.z = Camera.main.WorldToScreenPoint(CurrentBuilding.transform.position).z;
         Vector3 objectPosition = Camera.main.ScreenToWorldPoint(mousePosition);
@@ -84,33 +114,5 @@ public class BuildManager
         _bound.MaxX = CurrentBuilding.transform.position.x + _currentMesh.bounds.size.x / 2;
         _bound.MinZ = CurrentBuilding.transform.position.z - _currentMesh.bounds.size.z / 2;
         _bound.MaxZ = CurrentBuilding.transform.position.z + _currentMesh.bounds.size.z / 2;
-
-        var units = GameObject.FindGameObjectsWithTag("Obstacle");
-        var node = Managers.Instance.Node.Buildings;
-        
-        foreach (var item in units)
-        {
-            if (!_bound.Contains(item.transform.position.x, item.transform.position.z)) continue;
-            _currentMesh.material = _redMaterial;
-            return;
-        }
-        
-        foreach (var item in node)
-        {
-            if (!_bound.Contains(item.X, item.Z)) continue;
-            switch (item.BnteractableTypes)
-            {
-                case InteractableTypes.Building:
-                    _canBuild = false;
-                    _currentMesh.material = _redMaterial;
-                    return;
-                case InteractableTypes.None:
-                    _canBuild = true;
-                    _currentMesh.material = _originalMaterial;
-                    break;
-            }
-        }
-        
     }
-
 }

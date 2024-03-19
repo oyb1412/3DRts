@@ -12,13 +12,7 @@ public class WorkerController : PlayerUnitBase,IAttacker, IBuilder
     public void SetBuildState(GameObject go)
     {
         LockTarget = go;
-        SetState(new BuildMoveState(this));
-    }
-
-    public void OnBuildEvent()
-    {
-        if (LockTarget == null)
-            SetState(new IdleState(this));
+        SetState(new Unit.State.BuildMoveState(this));
     }
     
     protected override void OnAttackEvent()

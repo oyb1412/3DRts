@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class GoldMineController : MonoBehaviour, IInstallation
+public class GoldMineController : MonoBehaviour
 {
-    public GameObject GetThisObject()
-    {
-        return gameObject;
-    }
+   
 }

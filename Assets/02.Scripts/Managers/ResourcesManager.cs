@@ -30,6 +30,8 @@ public class ResourcesManager
             return null;
         }
 
+        Managers.Game.CreateUnitSaveToAllUnitList(obj);
+        
         if (obj.GetComponent<Poolable>() != null)
             return Managers.Pool.Activation(obj).gameObject;
         

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ArcherController : PlayerUnitBase,  IAttacker
+public class ArcherController : PlayerUnitBase, IAttacker
 {
     private GameObject _firePos;
     

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3419081560600130289}
   - component: {fileID: 4066748600443788486}
   - component: {fileID: 7563966191650935030}
+  - component: {fileID: -6799064617391840322}
   m_Layer: 10
   m_Name: GoldMine
   m_TagString: Untagged
@@ -138,3 +139,15 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: -0.43800002, y: 0.531, z: 0.127}
   m_TimeToStationary: 0.5
+--- !u!114 &-6799064617391840322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344418497463788484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88467c13436ad5d49a9e31445a2c4403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

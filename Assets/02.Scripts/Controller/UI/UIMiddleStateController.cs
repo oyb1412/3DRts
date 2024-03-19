@@ -12,14 +12,12 @@ public class UIMiddleStateController : UIBase
         BuildingStatePanel,
     }
 
-    private Panels _myPanels;
     private Dictionary<string, GameObject> _panels = new Dictionary<string, GameObject>();
 
     private void Start()
     {
         Bind<GameObject>(typeof(Panels));
         int count = 0;
-        
         foreach (var value in Enum.GetValues(typeof(Panels)))
         {
             string panelName = Enum.GetName(typeof(Panels), value);

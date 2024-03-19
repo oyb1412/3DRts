@@ -1,92 +1,138 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Flags]
-public enum InteractableTypes
+public enum NodeTypes
 {
     None,
     Building,
-    Mineral,
+    Unit,
 }
 
-public enum RevealedTypes
-{
-    Black,
-    Gray,
-    White
-}
 public struct NodeData
 {
-    public InteractableTypes BnteractableTypes;
-    public bool isTrigger;
+    public NodeTypes NodeTypes;
+    public bool HasFoundSeen;
     public bool HasBeenSeen;
-    public int X;
-    public int Z;
+    public int PosX;
+    public int PosZ;
 }
 
 public class Node : MonoBehaviour
 {
-    public Terrain _terrain;
-    public NodeData[,] Buildings;
+    public Terrain Terrain;
+    public NodeData[,] Nodes;
     void Awake()
     {
-        _terrain = GetComponent<Terrain>();
-        Vector3 terrainSize = _terrain.terrainData.size;
-        Buildings = new NodeData[(int)terrainSize.x, (int)terrainSize.z];
-        for (int z = 0; z < Buildings.GetLength(0); z++)
+        Terrain = GetComponent<Terrain>();
+        Vector3 terrainSize = Terrain.terrainData.size;
+        Nodes = new NodeData[(int)terrainSize.x, (int)terrainSize.z];
+        for (int z = 0; z < Nodes.GetLength(0); z++)
         {
-            for (int x = 0; x < Buildings.GetLength(1); x++)
+            for (int x = 0; x < Nodes.GetLength(1); x++)
             {
-                Buildings[z, x].X = x;
-                Buildings[z, x].Z = z;
+                Nodes[z, x].PosX = x;
+                Nodes[z, x].PosZ = z;
+            }
+        }
+    }
+
+    private void Update()
+    {
+        var units = GameObject.FindObjectsByType<Mark>(FindObjectsSortMode.None);
+        ResetNodeTriggers();
+        foreach (var unit in units)
+        {
+            CheckUnitSightRange(unit.transform, 10f);
+        }
+        UpdateNodeColors();
+    }
+    
+    void CheckUnitSightRange(Transform unitTransform, float sightRange)
+    {
+        for (int z = 0; z < Nodes.GetLength(0); z++)
+        {
+            for (int x = 0; x < Nodes.GetLength(1); x++)
+            {
+                float distance = (new Vector3(Nodes[z, x].PosX, 0, Nodes[z, x].PosZ) - unitTransform.position).magnitude;
+                if (distance < sightRange)
+                {
+                    Nodes[z, x].HasFoundSeen = true; 
+                    Nodes[z, x].HasBeenSeen = true; 
+                }
+                
+                float unitDistance = (new Vector3(Nodes[z, x].PosX, 0, Nodes[z, x].PosZ) - unitTransform.position).magnitude;
+                if (unitDistance < 3f)
+                {
+                    Nodes[z, x].NodeTypes = NodeTypes.Unit;
+                }
+
             }
         }
     }
     
-    public void SetNodeColor(int x, int z, Color color, bool trigger)
+    void UpdateNodeColors()
     {
-        if (Buildings[x, z].isTrigger)
-            return;
-        
-        Buildings[x, z].isTrigger = trigger;
-
-    }
-    
-    public void UpdateNodesColor(Transform tr, float siteRange)
-    {
-        Color[] colors = Managers.Instance.MiniMap.MinimapTexture.GetPixels();
-        
+        Color[] miniMapColors = Managers.Instance.MiniMap.Texture.GetPixels();
+        Color[] fogOfWarColors = Managers.Instance.FogOfWar.Texture.GetPixels();
         bool isUpdate = false;
-        for (int z = 0; z < Buildings.GetLength(0); z++)
+
+        for (int z = 0; z < Nodes.GetLength(0); z++)
         {
-            for (int x = 0; x < Buildings.GetLength(1); x++)
+            for (int x = 0; x < Nodes.GetLength(1); x++)
             {
-                float dis = (new Vector3(Buildings[z, x].X, 2f, Buildings[z, x].Z) - tr.position).magnitude;
-                if (dis > siteRange)
+                if (Nodes[z, x].HasBeenSeen && !Nodes[z, x].HasFoundSeen)
                 {
-                    if(!Buildings[z, x].HasBeenSeen)
-                        continue;
-                    
-                    colors[z * Buildings.GetLength(0) + x] = new Color(1f,0f,0f,0.5f);
+                    miniMapColors[z * Nodes.GetLength(0) + x] = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+                    fogOfWarColors[(z) * Nodes.GetLength(0) + x] = new Color(0.5f, 0.5f, 0.5f, 0.5f);
                     isUpdate = true;
                 }
-                else 
+                else if (Nodes[z, x].HasFoundSeen)
                 {
-                    if(Buildings[z, x].isTrigger)
-                        continue;
-                    
-                    Buildings[z, x].isTrigger = true;
-                    Buildings[z, x].HasBeenSeen = true;
-                    colors[z * Buildings.GetLength(0) + x] = Color.clear; 
+                    if (Nodes[z, x].NodeTypes == NodeTypes.Unit ||
+                        Nodes[z, x].NodeTypes == NodeTypes.Building)
+                    {
+                        miniMapColors[z * Nodes.GetLength(0) + x] = new Color(0f, 1f, 0f, 0.5f);
+                        fogOfWarColors[z * Nodes.GetLength(0) + x] = Color.clear;
+                        isUpdate = true;
+                    }
+                    else
+                    {
+                        miniMapColors[z * Nodes.GetLength(0) + x] = Color.clear;
+                        fogOfWarColors[z * Nodes.GetLength(0) + x] = Color.clear;
+                        isUpdate = true;
+                    }
+                   
+                }
+                else
+                {
+                    miniMapColors[z * Nodes.GetLength(0) + x] = Color.black;
+                    fogOfWarColors[z * Nodes.GetLength(0) + x] = Color.black;
                     isUpdate = true;
                 }
             }
         }
-        
-        if(isUpdate)
-            Managers.Instance.MiniMap.UpdateMinimap(colors);
+        if (isUpdate)
+        {
+            Managers.Instance.MiniMap.UpdateMap(miniMapColors);
+            Managers.Instance.FogOfWar.UpdateMap(fogOfWarColors);
+        }
     }
+    void ResetNodeTriggers()
+    {
+        for (int z = 0; z < Nodes.GetLength(0); z++)
+        {
+            for (int x = 0; x < Nodes.GetLength(1); x++)
+            {
+                Nodes[z, x].HasFoundSeen = false;
+                
+                if(Nodes[z,x].NodeTypes != NodeTypes.Building)
+                    Nodes[z, x].NodeTypes = NodeTypes.None;
 
+            }
+        }
+    }
     
     public void SetNode(GameObject go)
     {
@@ -99,16 +145,14 @@ public class Node : MonoBehaviour
         SetNode(bound);
     }
 
-  
-    
     public void SetNode(Util.MyRect bound)
     {
-        for (int z = 0; z < Buildings.GetLength(1); z++)
+        for (int z = 0; z < Nodes.GetLength(1); z++)
         {
-            for (int x = 0; x < Buildings.GetLength(0); x++)
+            for (int x = 0; x < Nodes.GetLength(0); x++)
             {
-                if (bound.Contains(Buildings[z,x].X, Buildings[z,x].Z))
-                    Buildings[z, x].BnteractableTypes = InteractableTypes.Building;
+                if (bound.Contains(Nodes[z,x].PosX, Nodes[z,x].PosZ))
+                    Nodes[z, x].NodeTypes = NodeTypes.Building;
             }
         }
     }

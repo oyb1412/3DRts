@@ -52,8 +52,6 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
     public IUnitState CurrentState;
     private GameObject _selectMarker;
     private GameObject _hpBar;
-    private float SiteRange = 10f;
-    private float SiteTime = 1f;
     [HideInInspector]public float ScanRange = 5f;
 
     public Action<float> OnHpEvent { get; set; }
@@ -72,7 +70,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
         Status = Util.GetOrAddComponent<UnitStatus>(gameObject);
         Nma = GetComponent<NavMeshAgent>();
         Anime = GetComponent<Animator>();
-        CurrentState = new IdleState(this);
+        CurrentState = new Unit.State.IdleState(this);
         Status.MoveSpeed = 4;
         Status.Hp = 50;
         Status.AttackDamage = 5;
@@ -84,16 +82,6 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
     void Update()
     {
         CurrentState.OnUpdate(this);
-
-        SiteTime += Time.deltaTime;
-
-        if (SiteTime < 1)
-            return;
-        
-        var node = Managers.Instance.Node;
-        node.UpdateNodesColor(transform, SiteRange);
-
-        SiteTime = 0;
     }
     protected abstract void OnAttackEvent();
     public void OnDieEvent()
@@ -114,13 +102,13 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
         OnHpEvent?.Invoke(Status.Hp / Status.MaxHp);
         if (Status.Hp <= 0)
         {
-            SetState(new DieState(this));
+            SetState(new Unit.State.DieState(this));
         }
     }
 
     public void PlayerUnitMove(Vector3 destPos, IUnitState state)
     {
-        if (CurrentState is BuildState)
+        if (CurrentState is Unit.State.BuildState)
             return;
         
         DestPos = destPos;
@@ -130,7 +118,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
 
     public void PlayerUnitAttack(GameObject target, IUnitState state)
     {
-        if (CurrentState is BuildState)
+        if (CurrentState is Unit.State.BuildState)
             return;
         
         LockTarget = target;

@@ -19,6 +19,6 @@ public class UICastle : UIBase
 
 
         _castleBtns.onClick.AddListener(
-            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<IUnitProducer>().SetCreating((int)CastleBtns.CreateWorkerBtn));
+            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<CastleController>().SetCreating((int)CastleBtns.CreateWorkerBtn));
     }
 }

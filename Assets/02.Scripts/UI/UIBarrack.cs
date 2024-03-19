@@ -22,8 +22,8 @@ public class UIBarrack : UIBase
         }
         
         _barrackBtns[(int)AttackerBtns.CreateSwordManBtn].onClick.AddListener(
-            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<IUnitProducer>().SetCreating((int)AttackerBtns.CreateSwordManBtn));
+            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<CreatorBuildingBase>().SetCreating((int)AttackerBtns.CreateSwordManBtn));
         _barrackBtns[(int)AttackerBtns.CreateArcherBtn].onClick.AddListener(
-            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<IUnitProducer>().SetCreating((int)AttackerBtns.CreateArcherBtn));
+            () => Managers.Instance.UnitController.SelectBuilding.GetComponent<CreatorBuildingBase>().SetCreating((int)AttackerBtns.CreateArcherBtn));
     }
 }

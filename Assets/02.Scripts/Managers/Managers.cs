@@ -15,6 +15,7 @@ public class Managers : MonoBehaviour
     public UnitController UnitController;
     public Node Node;
     public UIMinimap MiniMap;
+    public UIFogOfWar FogOfWar;
     public UIBehaviourPanelController UIBehaviourPanel;
     public UIMiddleStateController UIMiddleStatePanel;
     public static CursorManager Cursor => _instance._cursor;

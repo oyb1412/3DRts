@@ -200,6 +200,7 @@ GameObject:
   - component: {fileID: 6538075211671064683}
   - component: {fileID: 859114181654003110}
   - component: {fileID: 7183031205963560270}
+  - component: {fileID: 5900916673458292946}
   m_Layer: 9
   m_Name: Castle
   m_TagString: Obstacle
@@ -322,6 +323,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4ed40371b584111bc1b530e1f9bb40e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MyType: 0
+  Worker: {fileID: 0}
   MyStatus: {fileID: 0}
 --- !u!208 &7183031205963560270
 NavMeshObstacle:
@@ -339,3 +342,15 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0.049000002, y: 2.1220002, z: -0.080000006}
   m_TimeToStationary: 0.5
+--- !u!114 &5900916673458292946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8240184688935440637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88467c13436ad5d49a9e31445a2c4403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -16,6 +16,11 @@ public class TowerController : BuildingBase
         UIBehavior = new TowerUIBehavior();
     }
 
+    public override void SetSelectedState(Define.Select selectedState)
+    {
+        DefaultSelectedState(selectedState);
+    }
+
     public override void Init()
     {
     }

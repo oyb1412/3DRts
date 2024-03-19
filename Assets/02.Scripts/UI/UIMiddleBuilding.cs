@@ -57,18 +57,18 @@ public class UIMiddleBuilding : UIBase
     }
     private void SetEvent(IAllUnit unit)
     {
-        BuildingBase go = unit as BuildingBase;
+        CreatorBuildingBase go = unit as CreatorBuildingBase;
         
         if (!go)
             return;
         
-        BuildingBase building = go.GetComponent<BuildingBase>();
+        CreatorBuildingBase building = go.GetComponent<CreatorBuildingBase>();
         
         building.OnHpEvent += (hp =>
             _singleTexts[(int)BuildingTexts.BuildingHpText].text = $"{hp:FO}");
         building.OnCreateSliderEvent += (amount => _singleSliders[(int)BuildingSliders.BuildingSlider].value = amount);
         building.OnCreateImageEvent += SetCreateImageEvent;
-        
+        building.OnCreateCompleteEvent += () => _singleSliders[(int)BuildingSliders.BuildingSlider].gameObject.SetActive(true);
         building.OnCreateStartEvent +=
             () => _singleSliders[(int)BuildingSliders.BuildingSlider].gameObject.SetActive(true);
         building.OnBuildEvent += (amount => _singleSliders[(int)BuildingSliders.BuildingSlider].value = amount);

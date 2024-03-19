@@ -13,6 +13,7 @@ public class GameScene : BaseScene
         base.Init();
         GameObject castle = Managers.Resources.Activation("Building/Castle", null);
         castle.transform.position = new Vector3(15f, 2f, 15f);
+        castle.GetComponent<BuildingBase>().Init();
         Managers.Instance.Node.SetNode(castle);
         GameObject mine = Managers.Resources.Activation("Building/GoldMine", null);
         mine.transform.position = new Vector3(21f, 2f, 7f);
