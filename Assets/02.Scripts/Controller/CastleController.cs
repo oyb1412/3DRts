@@ -13,6 +13,7 @@ public class CastleController : CreatorBuildingBase
 
     public override void Init()
     {
+        base.Init();
         GameObject go = Resources.Load<GameObject>("Prefabs/Unit/Worker");
         Units.Add(go);
     }

@@ -14,13 +14,9 @@ public class UIBarrack : UIBase
 
     private void Start()
     {
-        Bind<Button>(typeof(AttackerBtns));
+        _barrackBtns.Add(Util.FindChild(gameObject, "CreateSwordManBtn").GetComponent<Button>());
+        _barrackBtns.Add(Util.FindChild(gameObject, "CreateArcherBtn").GetComponent<Button>());
 
-        for (int i = 0; i < Enum.GetValues(typeof(AttackerBtns)).Length; i++)
-        {
-            _barrackBtns.Add(Get<Button>(i).GetComponent<Button>());
-        }
-        
         _barrackBtns[(int)AttackerBtns.CreateSwordManBtn].onClick.AddListener(
             () => Managers.Instance.UnitController.SelectBuilding.GetComponent<CreatorBuildingBase>().SetCreating((int)AttackerBtns.CreateSwordManBtn));
         _barrackBtns[(int)AttackerBtns.CreateArcherBtn].onClick.AddListener(

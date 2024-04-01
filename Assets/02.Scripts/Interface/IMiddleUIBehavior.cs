@@ -4,5 +4,5 @@ using UnityEngine.UI;
 
 public interface IMiddleUIBehavior
 {
-    void UpdateUI(Dictionary<string, GameObject> panels, List<IAllUnit> units);
+    void UpdateUI(List<GameObject> panels, List<IAllUnit> units);
 }

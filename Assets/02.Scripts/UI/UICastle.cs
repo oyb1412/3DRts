@@ -14,9 +14,7 @@ public class UICastle : UIBase
 
     private void Start()
     {
-        Bind<Button>(typeof(CastleBtns));
-        _castleBtns = Get<Button>((int)CastleBtns.CreateWorkerBtn).GetComponent<Button>();
-
+        _castleBtns = Util.FindChild(gameObject, "CreateWorkerBtn").GetComponent<Button>();
 
         _castleBtns.onClick.AddListener(
             () => Managers.Instance.UnitController.SelectBuilding.GetComponent<CastleController>().SetCreating((int)CastleBtns.CreateWorkerBtn));

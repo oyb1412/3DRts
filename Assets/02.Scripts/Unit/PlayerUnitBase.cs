@@ -125,7 +125,7 @@ public abstract class PlayerUnitBase : MonoBehaviour, IHit, IUIBehavior, IAllUni
         SetState(state);
     }
 
-    public void UpdateUI(Dictionary<string, GameObject> panels)
+    public void UpdateUI(List<GameObject> panels)
     {
         UIBehavior?.UpdateUI(panels);
 

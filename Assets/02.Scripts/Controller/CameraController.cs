@@ -7,11 +7,11 @@ public class CameraController : MonoBehaviour
     private Vector2Int _limitMax;
     private Vector2Int _limit;
     [SerializeField]private float Speed;
-    public Vector3 DefaultPos;
+    [HideInInspector]public Vector3 DefaultPos;
     private void Start()
     {
-        _limit.x = Screen.width / 50;
-        _limit.y = Screen.height / 50;
+        _limit.x = Screen.width / 10;
+        _limit.y = Screen.height / 10;
         
         _limitMin.x = Screen.width - Screen.width + _limit.x;
         _limitMin.y = Screen.height - Screen.height + _limit.y;
@@ -36,7 +36,6 @@ public class CameraController : MonoBehaviour
         {
             transform.position -= Vector3.left * (Speed * Time.deltaTime);
         }
-
         if (Input.mousePosition.y < _limitMin.y && Input.mousePosition.y > 0 )
         {
             transform.position += Vector3.back * (Speed * Time.deltaTime);

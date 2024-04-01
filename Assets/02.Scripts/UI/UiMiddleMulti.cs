@@ -19,6 +19,7 @@ public class UiMiddleMulti : UIBase
         UnitIconImage9,
         UnitIconImage10,
         UnitIconImage11,
+        Count,
     }
 
     
@@ -26,11 +27,8 @@ public class UiMiddleMulti : UIBase
 
     private void Start()
     {
-        Bind<Image>(typeof(MiddleImages));
-
-        for (int i = 0; i < Enum.GetValues(typeof(MiddleImages)).Length; i++)
-        {
-            _singleImages.Add(Get<Image>(i).GetComponent<Image>());
+        for(int i = 0; i< (int)MiddleImages.Count; i++) {
+            _singleImages.Add(Util.FindChild(gameObject, $"UnitIconImage{i}").GetComponent<Image>());
         }
     }
 

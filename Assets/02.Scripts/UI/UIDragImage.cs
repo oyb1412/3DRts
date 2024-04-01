@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class UIDragImage : UIBase
 {
-    private new enum Images
+    private enum Images
     {
         Drag,
     }
@@ -17,8 +17,7 @@ public class UIDragImage : UIBase
     
     private void Start()
     {
-        Bind<Image>( typeof(Images));
-        _dragImage = Get<Image>((int)Images.Drag).GetComponent<Image>();
+        _dragImage = Util.FindChild(gameObject, "Drag").GetComponent<Image>();
     }
 
     private void Update()

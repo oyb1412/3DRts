@@ -21,7 +21,7 @@ public struct NodeData
 
 public class Node : MonoBehaviour
 {
-    public Terrain Terrain;
+    [HideInInspector]public Terrain Terrain;
     public NodeData[,] Nodes;
     void Awake()
     {
@@ -40,13 +40,13 @@ public class Node : MonoBehaviour
 
     private void Update()
     {
-        var units = GameObject.FindObjectsByType<Mark>(FindObjectsSortMode.None);
-        ResetNodeTriggers();
-        foreach (var unit in units)
-        {
-            CheckUnitSightRange(unit.transform, 10f);
-        }
-        UpdateNodeColors();
+        //var units = GameObject.FindObjectsByType<Mark>(FindObjectsSortMode.None);
+        //ResetNodeTriggers();
+        //foreach (var unit in units)
+        //{
+        //    CheckUnitSightRange(unit.transform, 10f);
+        //}
+        //UpdateNodeColors();
     }
     
     void CheckUnitSightRange(Transform unitTransform, float sightRange)
@@ -82,13 +82,13 @@ public class Node : MonoBehaviour
         {
             for (int x = 0; x < Nodes.GetLength(1); x++)
             {
-                if (Nodes[z, x].HasBeenSeen && !Nodes[z, x].HasFoundSeen)
-                {
-                    miniMapColors[z * Nodes.GetLength(0) + x] = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-                    fogOfWarColors[(z) * Nodes.GetLength(0) + x] = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-                    isUpdate = true;
-                }
-                else if (Nodes[z, x].HasFoundSeen)
+                //if (Nodes[z, x].HasBeenSeen && !Nodes[z, x].HasFoundSeen)
+                //{
+                //    miniMapColors[z * Nodes.GetLength(0) + x] = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+                //    fogOfWarColors[(z) * Nodes.GetLength(0) + x] = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+                //    isUpdate = true;
+                //}
+                /*else */if (Nodes[z, x].HasFoundSeen)
                 {
                     if (Nodes[z, x].NodeTypes == NodeTypes.Unit ||
                         Nodes[z, x].NodeTypes == NodeTypes.Building)
@@ -99,7 +99,7 @@ public class Node : MonoBehaviour
                     }
                     else
                     {
-                        miniMapColors[z * Nodes.GetLength(0) + x] = Color.clear;
+                        miniMapColors[z * Nodes.GetLength(0) + x] = new Color(.6f,.6f,.6f,1f);
                         fogOfWarColors[z * Nodes.GetLength(0) + x] = Color.clear;
                         isUpdate = true;
                     }

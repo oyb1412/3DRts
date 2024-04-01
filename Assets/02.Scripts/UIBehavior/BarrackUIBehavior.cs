@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 public class BarrackUIBehavior : IUIBehavior
 {
-    public void UpdateUI(Dictionary<string, GameObject> panels)
+    public void UpdateUI(List<GameObject> panels)
     {
         foreach (var t in panels)
         {
-            t.Value.gameObject.SetActive(false);
+            t.SetActive(false);
         }
-        panels[UIBehaviourPanelController.Panels.BarrackPanel.ToString()].gameObject.SetActive(true);
+        panels[(int)UIBehaviourPanelController.Panels.BarrackPanel].gameObject.SetActive(true);
     }
 }

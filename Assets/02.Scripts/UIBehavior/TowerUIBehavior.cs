@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 public class TowerUIBehavior : IUIBehavior
 {
-    public void UpdateUI(Dictionary<string, GameObject> panels)
+    public void UpdateUI(List<GameObject> panels)
     {
         foreach (var t in panels)
         {
-            t.Value.gameObject.SetActive(false);
+            t.SetActive(false);
         }
-        panels[UIBehaviourPanelController.Panels.TowerPanel.ToString()].gameObject.SetActive(true);
+        panels[(int)UIBehaviourPanelController.Panels.TowerPanel].gameObject.SetActive(true);
     }
 }

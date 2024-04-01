@@ -1,3 +1,4 @@
+using Building.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,56 +32,67 @@ public class UIMiddleBuilding : UIBase
     }
     
     private List<Image> _singleImages = new List<Image>();
-    private List<Slider> _singleSliders = new List<Slider>();
+    private Slider _singleSliders;
     private List<TextMeshProUGUI> _singleTexts = new List<TextMeshProUGUI>();
+    private CreatorBuildingBase _selectedBuilding;
 
-    private void Start()
+    private void Awake()
     {
-        Bind<Image>(typeof(BuildingImages));
-        Bind<Slider>(typeof(BuildingSliders));
-        Bind<TextMeshProUGUI>(typeof(BuildingTexts));
+        _singleSliders = Util.FindChild(gameObject, "BuildingSlider").GetComponent<Slider>();
 
-        for (int i = 0; i < Enum.GetValues(typeof(BuildingImages)).Length; i++)
-        {
-            _singleImages.Add(Get<Image>(i).GetComponent<Image>());
-            _singleImages[i].gameObject.SetActive(false);
-        }
-        for (int i = 0; i < Enum.GetValues(typeof(BuildingSliders)).Length; i++)
-        {
-            _singleSliders.Add(Get<Slider>(i).GetComponent<Slider>());
-            _singleSliders[i].gameObject.SetActive(false);
-        }
-        for (int i = 0; i < Enum.GetValues(typeof(BuildingTexts)).Length; i++)
-        {
-            _singleTexts.Add(Get<TextMeshProUGUI>(i).GetComponent<TextMeshProUGUI>());
-        }
+        _singleImages.Add(Util.FindChild(gameObject, "BuildingIconImage").GetComponent<Image>());
+        _singleImages.Add(Util.FindChild(gameObject, "CreatingUnitImage0").GetComponent<Image>());
+        _singleImages.Add(Util.FindChild(gameObject, "CreatingUnitImage1").GetComponent<Image>());
+        _singleImages.Add(Util.FindChild(gameObject, "CreatingUnitImage2").GetComponent<Image>());
+        _singleImages.Add(Util.FindChild(gameObject, "CreatingUnitImage3").GetComponent<Image>());
+        _singleImages.Add(Util.FindChild(gameObject, "CreatingUnitImage4").GetComponent<Image>());
+
+        _singleTexts.Add(Util.FindChild(gameObject, "BuildingHpText").GetComponent<TextMeshProUGUI>());
+        _singleTexts.Add(Util.FindChild(gameObject, "BuildingNameText").GetComponent<TextMeshProUGUI>());
+        _singleTexts.Add(Util.FindChild(gameObject, "BuildingAttackText").GetComponent<TextMeshProUGUI>());
+        _singleTexts.Add(Util.FindChild(gameObject, "BuildingDefenseText").GetComponent<TextMeshProUGUI>());
     }
     private void SetEvent(IAllUnit unit)
     {
-        CreatorBuildingBase go = unit as CreatorBuildingBase;
+        CreatorBuildingBase building = unit as CreatorBuildingBase;
         
-        if (!go)
+        if (!building)
             return;
+
+        if(building.BuildState is BuildState or CreateState) {
+            _singleSliders.gameObject.SetActive(true);
+            building.OnCreateImageEvent += SetCreateImageEvent;
+
+        }
+        else {
+            _singleSliders.gameObject.SetActive(false);
+        }
         
-        CreatorBuildingBase building = go.GetComponent<CreatorBuildingBase>();
-        
+
+        building.OnBuildEvent += (amount => _singleSliders.value = amount);
+        building.OnCreateCompleteEvent += () => _singleSliders.gameObject.SetActive(false);
+        building.OnCreateSliderEvent += (amount => _singleSliders.value = amount);
+        building.OnCreateStartEvent +=
+            () => _singleSliders.gameObject.SetActive(true);
         building.OnHpEvent += (hp =>
             _singleTexts[(int)BuildingTexts.BuildingHpText].text = $"{hp:FO}");
-        building.OnCreateSliderEvent += (amount => _singleSliders[(int)BuildingSliders.BuildingSlider].value = amount);
-        building.OnCreateImageEvent += SetCreateImageEvent;
-        building.OnCreateCompleteEvent += () => _singleSliders[(int)BuildingSliders.BuildingSlider].gameObject.SetActive(true);
-        building.OnCreateStartEvent +=
-            () => _singleSliders[(int)BuildingSliders.BuildingSlider].gameObject.SetActive(true);
-        building.OnBuildEvent += (amount => _singleSliders[(int)BuildingSliders.BuildingSlider].value = amount);
+
+        if (unit is BuildingBase) {
+           BuildingBase build = unit as BuildingBase;
+            build.OnBuildCompleteEvent += () => _singleSliders.gameObject.SetActive(false);
+        }
     }
 
     private void OnDisable()
     {
-        _singleSliders[(int)BuildingSliders.BuildingSlider].value = 0f;
         for (int i = 1; i < _singleImages.Count; i++)
         {
             _singleImages[i].gameObject.SetActive(false);
         }
+
+        if(_singleSliders != null)
+            _singleSliders.value = 0f;
+
     }
 
     private void SetCreateImageEvent(int count)

@@ -15,40 +15,40 @@ public class UIBehaviourPanelController : UIBase
         TowerPanel,
     }
 
-    private Panels _myPanels;
-    private Dictionary<string, GameObject> _panels = new Dictionary<string, GameObject>();
+    private List<GameObject> _panels = new List<GameObject>();
 
     private void Start()
     {
-        Bind<GameObject>(typeof(Panels));
-        int count = 0;
-        foreach (var value in Enum.GetValues(typeof(Panels)))
-        {
-           string panelName = Enum.GetName(typeof(Panels), value);
-           _panels.Add(panelName, Get(count));
-           _panels[panelName].gameObject.SetActive(false);
-           count++;
+        _panels.Add(Util.FindChild(gameObject, "AttackerPanel"));
+        _panels.Add(Util.FindChild(gameObject, "WorkerPanel"));
+        _panels.Add(Util.FindChild(gameObject, "BuildPanel"));
+        _panels.Add(Util.FindChild(gameObject, "BarrackPanel"));
+        _panels.Add(Util.FindChild(gameObject, "CastlePanel"));
+        _panels.Add(Util.FindChild(gameObject, "TowerPanel"));
+
+        foreach (GameObject t in _panels) {
+            t.SetActive(false);
         }
-        
+
         Managers.Instance.UnitController.BehaviourUIEvent += SetBehaviourBtn;
         Managers.Build.CancelBuild += HideUI;
     }
 
     public void ShowUI(Panels activePanel)
     {
-        foreach (var t in _panels)
+        foreach (GameObject t in _panels)
         {
-            t.Value.gameObject.SetActive(false);
+            t.SetActive(false);
         }
         
-        _panels[activePanel.ToString()].gameObject.SetActive(true);
+        _panels[(int)activePanel].SetActive(true);
     }
     
     public void HideUI()
     {
-        foreach (var t in _panels)
+        foreach (GameObject t in _panels)
         {
-            t.Value.gameObject.SetActive(false);
+            t.SetActive(false);
         }
     }
 

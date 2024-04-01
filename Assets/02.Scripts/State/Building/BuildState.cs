@@ -17,7 +17,7 @@ namespace Building.State
             else
                 unit.BuildState = new IdleState();
 
-
+            unit.OnBuildCompleteEvent?.Invoke();
             unit.Worker.SetState(new Unit.State.IdleState(unit.Worker));
         }
     }

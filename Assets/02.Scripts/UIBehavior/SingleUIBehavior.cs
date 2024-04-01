@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class SingleUIBehavior : IMiddleUIBehavior
 {
-    public void UpdateUI(Dictionary<string, GameObject> panels, List<IAllUnit> units)
+    public void UpdateUI(List<GameObject> panels, List<IAllUnit> units)
     {
         foreach (var t in panels)
         {
-            t.Value.gameObject.SetActive(false);
+            t.SetActive(false);
         }
-        panels[UIMiddleStateController.Panels.SingleStatePanel.ToString()].gameObject.SetActive(true);
-        panels[UIMiddleStateController.Panels.SingleStatePanel.ToString()].GetComponent<UIMiddleSingle>().SetUI(units);
+        panels[(int)UIMiddleStateController.Panels.SingleStatePanel].gameObject.SetActive(true);
+        panels[(int)UIMiddleStateController.Panels.SingleStatePanel].GetComponent<UIMiddleSingle>().SetUI(units);
     }
 }

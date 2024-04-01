@@ -113,7 +113,7 @@ Transform:
   m_GameObject: {fileID: 6159641819130553876}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 3, y: -0, z: 3.59}
+  m_LocalPosition: {x: 3, y: -0, z: 4.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -326,6 +326,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MyType: 0
   Worker: {fileID: 0}
+  _selectMarker: {fileID: 0}
+  _hpBar: {fileID: 0}
   MyStatus: {fileID: 0}
 --- !u!208 &4502914341592323982
 NavMeshObstacle:

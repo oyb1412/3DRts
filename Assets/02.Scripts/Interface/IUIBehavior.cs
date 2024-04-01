@@ -4,5 +4,5 @@ using UnityEngine.UI;
 
 public interface IUIBehavior
 {
-    void UpdateUI(Dictionary<string, GameObject> panels);
+    void UpdateUI(List<GameObject> panels);
 }

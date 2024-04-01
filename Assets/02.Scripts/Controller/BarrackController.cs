@@ -13,6 +13,7 @@ public class BarrackController : CreatorBuildingBase
 
     public override void Init()
     {
+        base.Init();
         GameObject swordMan = Resources.Load<GameObject>("Prefabs/Unit/Swordsman");
         GameObject archer = Resources.Load<GameObject>("Prefabs/Unit/Archer");
         Units.Add(swordMan);

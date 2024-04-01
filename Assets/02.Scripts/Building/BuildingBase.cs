@@ -43,6 +43,7 @@ public abstract class BuildingBase : MonoBehaviour, IHit, IUIBehavior, IAllUnit
 
         _select = selectedState;
     }
+    public Action OnBuildCompleteEvent;
     public Action<float> OnHpEvent { get; set; }
     public Action<float> OnBuildEvent { get; set; }
     public Action DeleteHpBarEvent { get; set; }
@@ -64,6 +65,7 @@ public abstract class BuildingBase : MonoBehaviour, IHit, IUIBehavior, IAllUnit
         MyStatus.Hp = MyStatus.MaxHp;
         MyStatus.CurrentBuildingTime = 0f;
         MyStatus.MaxBuildingTime = 10f;
+        Init();
     }
 
     public void Hit(IAttackerStatus status)
@@ -92,7 +94,7 @@ public abstract class BuildingBase : MonoBehaviour, IHit, IUIBehavior, IAllUnit
         BuildState.OnUpdate(this);
     }
 
-    public void UpdateUI(Dictionary<string, GameObject> panels)
+    public void UpdateUI(List<GameObject> panels)
     {
         UIBehavior?.UpdateUI(panels);
         if (BuildState is BuildState)

@@ -14,12 +14,8 @@ public class UIFogOfWar : UIMap
     protected override void Start()
     {
         base.Start();
-        Bind<RawImage>(typeof(RawImages));
+        RawImage.Add(Util.FindChild(gameObject, "FogOfWarRawImage").GetComponent<RawImage>());
 
-        for (int i = 0; i < Enum.GetValues(typeof(RawImages)).Length; i++)
-        {
-            RawImage.Add(Get<RawImage>(i).GetComponent<RawImage>());
-        }
         RawImage[(int)RawImages.FogOfWarRawImage].texture = Texture;
     }
 }

@@ -20,21 +20,16 @@ public class UIMiddleSingle : UIBase
         UnitNameText,
     }
     
-    private List<Image> _singleImages = new List<Image>();
+    private Image _singleImages;
     private List<TextMeshProUGUI> _singleTexts = new List<TextMeshProUGUI>();
     private void Start()
     {
-        Bind<Image>(typeof(SingleImages));
-        Bind<TextMeshProUGUI>(typeof(SingleTexts));
+        _singleImages = Util.FindChild(gameObject, "UnitIconImage").GetComponent<Image>();
 
-        for (int i = 0; i < Enum.GetValues(typeof(SingleImages)).Length; i++)
-        {
-            _singleImages.Add(Get<Image>(i).GetComponent<Image>());
-        }
-        for (int i = 0; i < Enum.GetValues(typeof(SingleTexts)).Length; i++)
-        {
-            _singleTexts.Add(Get<TextMeshProUGUI>(i).GetComponent<TextMeshProUGUI>());
-        }
+        _singleTexts.Add(Util.FindChild(gameObject, "UnitHpText").GetComponent<TextMeshProUGUI>());
+        _singleTexts.Add(Util.FindChild(gameObject, "UnitDamageText").GetComponent<TextMeshProUGUI>());
+        _singleTexts.Add(Util.FindChild(gameObject, "UnitDefenseText").GetComponent<TextMeshProUGUI>());
+        _singleTexts.Add(Util.FindChild(gameObject, "UnitNameText").GetComponent<TextMeshProUGUI>());
     }
 
     private void SetHpEvent(IAllUnit unit)

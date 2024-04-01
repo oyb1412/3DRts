@@ -18,12 +18,11 @@ public class UIWorker : UIBase
 
     private void Start()
     {
-        Bind<Button>(typeof(WorkerBtns));
-        
-        for (int i = 0; i < Enum.GetValues(typeof(WorkerBtns)).Length; i++)
-        {
-            _workerBtns.Add(Get<Button>(i).GetComponent<Button>());
-        }
+        _workerBtns.Add(Util.FindChild(gameObject, "MoveBtn").GetComponent<Button>());
+        _workerBtns.Add(Util.FindChild(gameObject, "StopBtn").GetComponent<Button>());
+        _workerBtns.Add(Util.FindChild(gameObject, "AttackBtn").GetComponent<Button>());
+        _workerBtns.Add(Util.FindChild(gameObject, "HoldBtn").GetComponent<Button>());
+        _workerBtns.Add(Util.FindChild(gameObject, "BuildBtn").GetComponent<Button>());
         
         _workerBtns[(int)WorkerBtns.AttackBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickA));
         _workerBtns[(int)WorkerBtns.MoveBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickQ));

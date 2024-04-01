@@ -18,23 +18,17 @@ public class UIMinimap : UIMap
         MinimapIndicator,
     }
 
-    private List<Image> _indicatorList = new List<Image>();
+    private Image _indicator;
     private RectTransform _indicatorRect;
     protected override void Start()
     {
         base.Start();
-        Bind<RawImage>(typeof(RawImages));
-        Bind<Image>(typeof(Images));
-        for (int i = 0; i < Enum.GetValues(typeof(RawImages)).Length; i++)
-        {
-            RawImage.Add(Get<RawImage>(i).GetComponent<RawImage>());
-        }
-        for (int i = 0; i < Enum.GetValues(typeof(Images)).Length; i++)
-        {
-            _indicatorList.Add(Get<Image>(i).GetComponent<Image>());
-        }
+
+        _indicator = Util.FindChild(gameObject, "MinimapIndicator").GetComponent<Image>();
+        RawImage.Add(Util.FindChild(gameObject, "MinimapRawImage").GetComponent<RawImage>());
+        
         BindEvent(RawImage[(int)RawImages.MinimapRawImage].gameObject,ClickedIndicator,Define.MouseEventType.LeftClick);
-        _indicatorRect = _indicatorList[(int)Images.MinimapIndicator].GetComponent<RectTransform>();
+        _indicatorRect = _indicator.GetComponent<RectTransform>();
         RawImage[(int)RawImages.MinimapRawImage].texture = Texture;
     }
 

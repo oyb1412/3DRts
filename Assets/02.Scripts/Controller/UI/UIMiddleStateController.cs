@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UIMiddleStateController : UIBase
@@ -12,21 +13,17 @@ public class UIMiddleStateController : UIBase
         BuildingStatePanel,
     }
 
-    private Dictionary<string, GameObject> _panels = new Dictionary<string, GameObject>();
+    private List<GameObject> _panels = new List<GameObject>();
 
     private void Start()
     {
-        Bind<GameObject>(typeof(Panels));
-        int count = 0;
-        foreach (var value in Enum.GetValues(typeof(Panels)))
-        {
-            string panelName = Enum.GetName(typeof(Panels), value);
-            _panels.TryAdd(panelName, Get(count));
-            _panels[panelName].gameObject.SetActive(false);
-            count++;
+        _panels.Add(Util.FindChild(gameObject, "SingleStatePanel"));
+        _panels.Add(Util.FindChild(gameObject, "MultiStatePanel"));
+        _panels.Add(Util.FindChild(gameObject, "BuildingStatePanel"));
+        
+        foreach(GameObject t in  _panels) {
+            t.SetActive(false);
         }
-
-        var q = _panels;
         
         Managers.Instance.UnitController.MiddleBehaviourUIEvent += SetBehaviourBtn;
         Managers.Build.CancelBuild += HideUI;
@@ -34,19 +31,17 @@ public class UIMiddleStateController : UIBase
 
     public void ShowUI(Panels activePanel)
     {
-        foreach (var t in _panels)
-        {
-            t.Value.gameObject.SetActive(false);
+        foreach (GameObject t in _panels) {
+            t.SetActive(false);
         }
-        
-        _panels[activePanel.ToString()].gameObject.SetActive(true);
+
+        _panels[(int)activePanel].SetActive(true);
     }
     
     public void HideUI()
     {
-        foreach (var t in _panels)
-        {
-            t.Value.gameObject.SetActive(false);
+        foreach (GameObject t in _panels) {
+            t.SetActive(false);
         }
     }
 

@@ -16,13 +16,11 @@ public class UIAttacker : UIBase
 
     private void Start()
     {
-        Bind<Button>(typeof(AttackerBtns));
+        _attackBtns.Add(Util.FindChild(gameObject, "MoveBtn").GetComponent<Button>());
+        _attackBtns.Add(Util.FindChild(gameObject, "StopBtn").GetComponent<Button>());
+        _attackBtns.Add(Util.FindChild(gameObject, "AttackBtn").GetComponent<Button>());
+        _attackBtns.Add(Util.FindChild(gameObject, "HoldBtn").GetComponent<Button>());
 
-        for (int i = 0; i < Enum.GetValues(typeof(AttackerBtns)).Length; i++)
-        {
-            _attackBtns.Add(Get<Button>(i).GetComponent<Button>());
-        }
-        
         _attackBtns[(int)AttackerBtns.AttackBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickA));
         _attackBtns[(int)AttackerBtns.MoveBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickQ));
         _attackBtns[(int)AttackerBtns.StopBtn].onClick.AddListener(() => Managers.Instance.UnitController.SetState(UnitController.State.ClickS));

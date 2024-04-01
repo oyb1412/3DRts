@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class BuildingUIBehavior : IMiddleUIBehavior
 {
-    public void UpdateUI(Dictionary<string, GameObject> panels, List<IAllUnit> units)
+    public void UpdateUI(List<GameObject> panels, List<IAllUnit> units)
     {
         foreach (var t in panels)
         {
-            t.Value.gameObject.SetActive(false);
+            t.SetActive(false);
         }
-        panels[UIMiddleStateController.Panels.BuildingStatePanel.ToString()].gameObject.SetActive(true);
-        panels[UIMiddleStateController.Panels.BuildingStatePanel.ToString()].GetComponent<UIMiddleBuilding>().SetUI(units);
+        panels[(int)UIMiddleStateController.Panels.BuildingStatePanel].gameObject.SetActive(true);
+        panels[(int)UIMiddleStateController.Panels.BuildingStatePanel].GetComponent<UIMiddleBuilding>().SetUI(units);
     }
 }
